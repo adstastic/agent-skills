@@ -1,0 +1,17 @@
+.DS_Store
+*.log
+*.tmp
+
+# Local/private skill state/config
+**/state/*.env
+**/state/*.json
+**/state/*.local
+*.local.env
+ios-device-runner/*.env
+!ios-device-runner/config.example.env
+
+# Common build/cache outputs
+build/
+DerivedData/
+node_modules/
+.cache/
