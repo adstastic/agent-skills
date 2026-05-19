@@ -6,6 +6,8 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 
 ## Skills
 
+- `dev-loop-build` — tactical TDD workflow for implementing an agreed small vertical slice.
+- `dev-loop-design` — strategic workflow for shaping unclear/larger feature work before implementation.
 - `diagram` — render Mermaid diagrams to high-resolution PNGs.
 - `github-pr-review-comments` — read and manage GitHub PR review threads with `gh` + GraphQL.
 - `hunk-review` — interact with live Hunk diff review sessions via CLI.
