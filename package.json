@@ -1,0 +1,10 @@
+{
+  "name": "agent-skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable Markdown skills for coding agents, packaged for Pi.",
+  "keywords": ["pi-package", "agent-skills", "skills"],
+  "pi": {
+    "skills": ["."]
+  }
+}
