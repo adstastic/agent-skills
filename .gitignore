@@ -14,4 +14,5 @@ ios-device-runner/*.env
 build/
 DerivedData/
 node_modules/
+package-lock.json
 .cache/

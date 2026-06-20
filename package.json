@@ -5,6 +5,6 @@
   "description": "Portable Markdown skills for coding agents, packaged for Pi.",
   "keywords": ["pi-package", "agent-skills", "skills"],
   "pi": {
-    "skills": ["."]
+    "skills": ["*/SKILL.md"]
   }
 }
