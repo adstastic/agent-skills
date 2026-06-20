@@ -8,6 +8,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 
 - `dev-loop-build` — tactical TDD workflow for implementing an agreed small vertical slice.
 - `dev-loop-design` — strategic workflow for shaping unclear/larger feature work before implementation.
+- `deep-research-pro` — run ChatGPT Deep Research through Oracle using Adi's logged-in ChatGPT Pro profile.
 - `diagram` — render Mermaid diagrams to high-resolution PNGs.
 - `github-pr-review-comments` — read and manage GitHub PR review threads with `gh` + GraphQL.
 - `grill-me` — stress-test a plan or design through one-question-at-a-time grilling.
@@ -15,8 +16,10 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - `grill-with-docs` — grill against project language and propose `CONTEXT.md`/ADR updates with approval gates.
 - `hunk-review` — interact with live Hunk diff review sessions via CLI.
 - `ios-device-runner` — build, install, and launch an iOS app on a physical device; configure with CLI flags, env vars, or a private `--config` file.
+- `phoenix` — tie meaningful code changes to durable claims, boundaries, oracles, renderings, and evidence.
 - `project-catchup` — quickly bootstrap context for active repo work.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
+- `thermo-nuclear-code-quality-review` — run an extremely strict maintainability and structural-simplification review.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
 
 ## Layout
