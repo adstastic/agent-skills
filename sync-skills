@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+add() {
+  npx -y skills add "$@" --global --agent claude-code --agent codex --agent pi --yes
+}
+
+add "$repo_dir" --skill '*'
+add adstastic/phoenix-architecture --skill phoenix-architecture
+add DietrichGebert/ponytail --skill '*'
+add https://github.com/cursor/plugins/tree/main/thermos \
+  --skill thermo-nuclear-review \
+  --skill thermo-nuclear-code-quality-review
+add leopiney/linus-torvalds-skills --skill torvalds-doctrine

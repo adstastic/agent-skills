@@ -16,11 +16,18 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - `grill-with-docs` — grill against project language and propose `CONTEXT.md`/ADR updates with approval gates.
 - `hunk-review` — interact with live Hunk diff review sessions via CLI.
 - `ios-device-runner` — build, install, and launch an iOS app on a physical device; configure with CLI flags, env vars, or a private `--config` file.
-- `phoenix` — tie meaningful code changes to durable claims, boundaries, oracles, renderings, and evidence.
 - `project-catchup` — quickly bootstrap context for active repo work.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
-- `thermo-nuclear-code-quality-review` — run an extremely strict maintainability and structural-simplification review.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
+
+`./sync-skills` also installs these directly from their upstream repositories:
+
+- [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
+- [Ponytail](https://github.com/DietrichGebert/ponytail)
+- The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
+- [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
+
+They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill is excluded because it currently invokes Cursor-specific subagents.
 
 ## Layout
 
@@ -33,65 +40,19 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 
 ## Install
 
-Copy any skill directory into your agent's skills/config directory, or point your agent at this repo.
-
-### Pi
-
-Pi discovers skills from global and project skill directories. Clone this repo under one of them, then restart Pi.
-
-Global install for current user:
+Clone the repo and run:
 
 ```bash
-mkdir -p ~/.pi/agent/skills
-git clone https://github.com/adstastic/agent-skills.git ~/.pi/agent/skills/agent-skills
+./sync-skills
 ```
 
-Generic global install usable by multiple agent harnesses:
+This installs the local and bundled upstream skills globally for Claude Code, Codex, and Pi using [`npx skills`](https://github.com/vercel-labs/skills). Run it again to fetch upstream changes or restore the bundle on another machine.
 
-```bash
-mkdir -p ~/.agents/skills
-git clone https://github.com/adstastic/agent-skills.git ~/.agents/skills/agent-skills
-```
-
-Project-local install:
-
-```bash
-mkdir -p .agents/skills
-git clone https://github.com/adstastic/agent-skills.git .agents/skills/agent-skills
-```
-
-One-off Pi session without installing globally:
+For a one-off Pi session without installing globally:
 
 ```bash
 pi --skill /path/to/agent-skills
 ```
-
-Or add repo path to Pi settings:
-
-```json
-{
-  "skills": ["/path/to/agent-skills"]
-}
-```
-
-Verify after restarting Pi:
-
-```text
-/skill:project-catchup
-/skill:repo-audit
-/skill:ios-device-runner --help
-```
-
-Update:
-
-```bash
-git -C ~/.pi/agent/skills/agent-skills pull
-# or wherever you cloned it
-```
-
-### Other agents
-
-Use the skill directory supported by your agent harness, or configure that agent to scan this repo. Each child directory containing `SKILL.md` is one skill.
 
 Helper scripts use relative paths in docs. If your agent runs from another directory, set a `SKILLS_DIR` env var or replace `./<skill>/scripts/...` with an absolute path in your local copy.
 
