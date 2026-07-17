@@ -26,6 +26,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - [Ponytail](https://github.com/DietrichGebert/ponytail)
 - The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
+- Selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills): `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `tdd`, and `teach`
 
 They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill is excluded because it currently invokes Cursor-specific subagents.
 
