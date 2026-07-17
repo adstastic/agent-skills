@@ -10,7 +10,6 @@ add() {
 
 add "$repo_dir" --skill '*'
 add adstastic/phoenix-architecture --skill phoenix-architecture
-add DietrichGebert/ponytail --skill '*'
 add https://github.com/cursor/plugins/tree/main/thermos \
   --skill thermo-nuclear-review \
   --skill thermo-nuclear-code-quality-review

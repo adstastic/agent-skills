@@ -23,7 +23,6 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 `./sync-skills` also installs these directly from their upstream repositories:
 
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
-- [Ponytail](https://github.com/DietrichGebert/ponytail)
 - The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
 - Selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills): `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `tdd`, and `teach`
