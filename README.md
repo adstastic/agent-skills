@@ -18,6 +18,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - `ios-device-runner` — build, install, and launch an iOS app on a physical device; configure with CLI flags, env vars, or a private `--config` file.
 - `project-catchup` — quickly bootstrap context for active repo work.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
+- `security-privacy-review` — audit a PR, diff, or codebase for security and privacy risks.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
 
 `./sync-skills` also installs these directly from their upstream repositories:
