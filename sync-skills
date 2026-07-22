@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+add() {
+  # Pi scans ~/.agents/skills directly; a Pi-specific link causes duplicate discovery.
+  npx -y skills add "$@" --global --agent claude-code --agent codex --yes
+}
+
+add "$repo_dir" --skill '*'
+add adstastic/phoenix-architecture --skill phoenix-architecture
+add https://github.com/cursor/plugins/tree/main/thermos \
+  --skill thermo-nuclear-review \
+  --skill thermo-nuclear-code-quality-review
+add leopiney/linus-torvalds-skills --skill torvalds-doctrine
+add mattpocock/skills \
+  --skill domain-modeling \
+  --skill grilling \
+  --skill handoff \
+  --skill improve-codebase-architecture \
+  --skill prototype \
+  --skill tdd \
+  --skill teach
