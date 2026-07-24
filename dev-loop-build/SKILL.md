@@ -28,10 +28,15 @@ This skill is repo-agnostic. Follow repo instructions, existing sources of truth
 ```bash
 git status --short --branch
 git diff --cached --stat
+git diff --cached --binary | git hash-object --stdin
 git log --oneline --decorate -n 8
 ```
 
-Read repo instructions, active spec/issue, relevant source/tests, recent dirty diff, and canonical checks. Record pre-existing staged and unstaged changes; do not overwrite, stage, or commit work you do not own. If the index is already non-empty, autonomous commit is unsafe unless ownership can be isolated without changing that index.
+Read repo instructions, active spec/issue, relevant source/tests, recent dirty diff, and canonical checks. Record pre-existing staged and unstaged changes; do not overwrite, stage, or commit work you do not own. Snapshot both staged paths and cached-diff hash so every later commit can prove index contents stayed unchanged.
+
+If `.phoenix/ACTIVE.md` exists, read it before acting, then verify every claim against current Git state and runnable evidence. Resume it only when it describes this task. If it belongs to another active task, stop and use a separate worktree; one worktree has one active autonomous dev loop.
+
+If active file is missing but `git show HEAD:.phoenix/ACTIVE.md` succeeds, inspect Git status. A working-tree deletion without a completed outcome commit means finalization was interrupted: restore checkpoint from `HEAD`, reconcile state, and resume.
 
 If no clear check command exists, infer focused checks from existing tooling. Ask before adding process files or new canonical scripts.
 
@@ -60,7 +65,36 @@ State:
 
 For algorithmic or optimization work, first prefer an obvious reference implementation likely to be correct. Optimize only after its Oracle passes, preserving the same behavior checks.
 
-### 4. TDD vertical slices
+### 4. Maintain compaction-safe execution state
+
+Before editing code, create `.phoenix/ACTIVE.md`. This tracked checkpoint is live execution memory, not durable product documentation. One worktree gets one active checkpoint.
+
+Keep it concise:
+
+```markdown
+# Active Dev Loop
+Task:
+Goal:
+Success criteria:
+Must remain true / non-goals:
+Current phase:
+Completed evidence:
+Current hypothesis:
+Next action:
+Owned files:
+Pre-existing work to preserve:
+Review findings / decisions pending:
+```
+
+Commit initial checkpoint by itself with `git commit --only -- .phoenix/ACTIVE.md`; for a new file, add it first. Use an outcome-neutral message such as `chore(dev-loop): checkpoint <task>`. Path-limited commit must exclude every pre-existing staged path.
+
+Refresh and commit checkpoint alone after every material transition: calibrated goal, meaningful red/green result, changed hypothesis, completed check, review findings, applied fix, or newly discovered blocker. Record exact commands/results compactly; never copy secrets, large logs, or replace source-of-truth specs. After each checkpoint commit, verify both pre-existing staged paths and cached-diff hash remain unchanged.
+
+After compaction, session resume, handoff, or any uncertainty about active state, read `.phoenix/ACTIVE.md` first and reconcile it with `git status`, diff, tests, and current repo state. Evidence wins over stale checkpoint text. Continue from recorded next action only after reconciliation.
+
+When blocked, interrupted, or waiting on a user decision, update and commit checkpoint before stopping. Final outcome commit deletes `.phoenix/ACTIVE.md`; checkpoint remains recoverable in Git history while no stale active file remains at HEAD.
+
+### 5. TDD vertical slices
 
 Load and follow `tdd`:
 
@@ -74,7 +108,7 @@ Fix root cause in the shared path after tracing every caller. Preserve unrelated
 
 Use real feedback loops available to the repo—compiler, browser/device tooling, sandbox, container, or provider eval—when success criteria require them.
 
-### 5. Verify before review
+### 6. Verify before review
 
 Run focused checks, relevant integration/e2e checks, then the repo's full check. Inspect actual changes:
 
@@ -85,7 +119,7 @@ git diff -- <relevant files>
 
 Read changed code, not just command output. Check for unrelated edits, leaked secrets/raw content, stale docs/status, missed callers, dead code, and success criteria not exercised by an Oracle.
 
-### 6. Launch adversarial review
+### 7. Launch adversarial review
 
 For non-mechanical changes, launch applicable reviewers as independent subagents in one parallel batch. Give each the agreed goal/spec, diff command, commit or worktree baseline, relevant repo instructions, and exact role. Require concise blocker-first findings with file/line evidence and explicit uncertainty.
 
@@ -101,7 +135,7 @@ For non-mechanical changes, launch applicable reviewers as independent subagents
 
 Skip subagents for a truly mechanical change with an obvious Oracle and tiny diff. If subagent tooling is unavailable, run one combined self-review, report reduced assurance, and never claim independent or parallel review occurred. If a named skill is unavailable, use the bounded role above rather than blocking.
 
-### 7. Triage, fix, and loop
+### 8. Triage, fix, and loop
 
 For every finding:
 
@@ -115,7 +149,7 @@ Do not blindly average conflicting reviewers. When Thermo asks for structure and
 
 Continue until success criteria pass and no verified blocking finding remains. Surface decision-required findings to the user with evidence; do not smuggle scope or slow-Boundary choices into a review fix.
 
-### 8. Record evidence and commit
+### 9. Record evidence and commit
 
 Update only existing agreed sources of truth when a durable Claim, Boundary, Decision, Evidence item, or feature state changed. Do not create status/process docs merely to narrate work.
 
@@ -128,9 +162,11 @@ git diff -- <relevant files>
 git status --short
 ```
 
-Stage only coherent files owned by this slice. Create one atomic local commit with a concise outcome-focused message only when commit permission is explicit and the index was clean at start. If the index had pre-existing entries or any edits cannot be separated safely, leave work uncommitted and report exact state instead of capturing someone else's changes.
+Update and commit final checkpoint alone, then delete `.phoenix/ACTIVE.md`. Create one outcome-focused commit containing only owned implementation paths plus checkpoint deletion, using path-limited commit semantics so pre-existing staged paths remain untouched. Add new owned files before committing. If outcome commit fails or is interrupted, restore checkpoint from `HEAD` immediately. Inspect exact commit diff and verify original staged paths and cached-diff hash before considering work complete.
 
-Never push unless the user asks.
+If owned edits overlap pre-existing work or cannot be isolated safely, keep and commit checkpoint, leave implementation uncommitted, and report exact state instead of capturing someone else's changes. Checkpoint and outcome commits require the explicit commit permission defined by this skill.
+
+Confirm final Git state and absence of `.phoenix/ACTIVE.md` at HEAD. Never push unless the user asks.
 
 ## End report
 
