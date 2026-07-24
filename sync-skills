@@ -15,10 +15,13 @@ add https://github.com/cursor/plugins/tree/main/thermos \
   --skill thermo-nuclear-code-quality-review
 add leopiney/linus-torvalds-skills --skill torvalds-doctrine
 add mattpocock/skills \
+  --skill code-review \
+  --skill codebase-design \
   --skill domain-modeling \
   --skill grilling \
   --skill handoff \
   --skill improve-codebase-architecture \
   --skill prototype \
+  --skill research \
   --skill tdd \
   --skill teach
