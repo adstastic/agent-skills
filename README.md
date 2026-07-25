@@ -6,8 +6,9 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 
 ## Skills
 
-- `dev-loop-build` — tactical TDD workflow for implementing an agreed small vertical slice.
-- `dev-loop-design` — strategic workflow for shaping unclear/larger feature work before implementation.
+- `dev-loop-build` — autonomously implement an agreed vertical slice with TDD, risk-adaptive adversarial review, and an atomic local commit.
+- `dev-loop-design` — shape unclear/larger work with pragmatic grilling, bounded research, competing designs, and adversarial review.
+- `dev-loop-pair` — implement an agreed slice through a tight staged-review loop with the user.
 - `deep-research-pro` — run ChatGPT Deep Research through Oracle using Adi's logged-in ChatGPT Pro profile.
 - `diagram` — render Mermaid diagrams to high-resolution PNGs.
 - `github-pr-review-comments` — read and manage GitHub PR review threads with `gh` + GraphQL.
@@ -16,6 +17,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - `grill-with-docs` — grill against project language and propose `CONTEXT.md`/ADR updates with approval gates.
 - `hunk-review` — interact with live Hunk diff review sessions via CLI.
 - `ios-device-runner` — build, install, and launch an iOS app on a physical device; configure with CLI flags, env vars, or a private `--config` file.
+- `phoenix-grilling` — extract success criteria and unresolved decisions through proportionate, non-leading, Phoenix-aware questioning.
 - `project-catchup` — quickly bootstrap context for active repo work.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
 - `security-privacy-review` — audit a PR, diff, or codebase for security and privacy risks.
@@ -26,7 +28,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
 - The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
-- Selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills): `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `tdd`, and `teach`
+- Selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills): `code-review`, `codebase-design`, `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `research`, `tdd`, and `teach`
 
 They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill is excluded because it currently invokes Cursor-specific subagents.
 
