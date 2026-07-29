@@ -2,7 +2,7 @@
 
 import * as p from '@clack/prompts';
 import { spawn } from 'node:child_process';
-import { existsSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
@@ -25,24 +25,38 @@ const commonAgents = [
 ];
 
 export const sources = [
-  { label: "Adi's Agent Skills", source: resolveOwnSource(), defaults: '*' },
-  { label: 'Vercel Labs', source: 'vercel-labs/agent-browser', defaults: ['agent-browser'] },
   {
+    id: 'adstastic/agent-skills',
+    label: "Adi's Agent Skills",
+    source: resolveOwnSource(),
+    defaults: '*',
+  },
+  {
+    id: 'vercel-labs/agent-browser',
+    label: 'Vercel Labs',
+    source: 'vercel-labs/agent-browser',
+    defaults: ['agent-browser'],
+  },
+  {
+    id: 'adstastic/phoenix-architecture',
     label: 'Phoenix Architecture',
     source: 'adstastic/phoenix-architecture',
     defaults: ['phoenix-architecture'],
   },
   {
+    id: 'cursor/plugins/thermos',
     label: 'Cursor Thermos',
     source: 'https://github.com/cursor/plugins/tree/main/thermos',
     defaults: ['thermo-nuclear-review', 'thermo-nuclear-code-quality-review'],
   },
   {
+    id: 'leopiney/linus-torvalds-skills',
     label: 'Torvalds Doctrine',
     source: 'leopiney/linus-torvalds-skills',
     defaults: ['torvalds-doctrine'],
   },
   {
+    id: 'mattpocock/skills',
     label: 'Matt Pocock',
     source: 'mattpocock/skills',
     defaults: [
@@ -59,6 +73,15 @@ export const sources = [
     ],
   },
 ];
+
+export const overrides = JSON.parse(
+  readFileSync(join(packageRoot, 'skill-overrides.json'), 'utf8')
+);
+for (const sourceId of Object.values(overrides)) {
+  if (!sources.some((source) => source.id === sourceId)) {
+    throw new Error(`Unknown override source: ${sourceId}`);
+  }
+}
 
 export function parseArgs(argv) {
   const options = { agents: [], copy: false, global: undefined, help: false, yes: false };
@@ -129,6 +152,30 @@ export function selectDefaults(catalogs = sources) {
     .filter((source) => source.skills.length > 0);
 }
 
+export function applyOverrides(catalogs) {
+  const preferredSelections = new Set(
+    Object.entries(overrides)
+      .filter(([name, sourceId]) =>
+        catalogs.some(
+          (source) =>
+            source.id === sourceId &&
+            source.skills.some((skill) => skill.name === name || skill.name === '*')
+        )
+      )
+      .map(([name]) => name)
+  );
+
+  return catalogs
+    .map((source) => ({
+      ...source,
+      skills: source.skills.filter(
+        (skill) =>
+          !preferredSelections.has(skill.name) || overrides[skill.name] === source.id
+      ),
+    }))
+    .filter((source) => source.skills.length > 0);
+}
+
 function cancelIfNeeded(value) {
   if (!p.isCancel(value)) return false;
   p.cancel('Installation cancelled');
@@ -146,6 +193,7 @@ function skillOwners(catalogs) {
 }
 
 async function resolveDuplicates(catalogs) {
+  catalogs = applyOverrides(catalogs);
   for (const [name, labels] of skillOwners(catalogs)) {
     if (labels.length < 2) continue;
     const selectedSource = await p.select({
@@ -306,7 +354,7 @@ export async function main(argv = process.argv.slice(2)) {
   let selected;
   let options;
   if (args.yes) {
-    selected = selectDefaults();
+    selected = applyOverrides(selectDefaults());
     options = { agents: args.agents, copy: args.copy, global: args.global ?? false };
   } else {
     p.intro('Agent Skills installer');

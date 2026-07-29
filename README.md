@@ -1,8 +1,8 @@
-# Agent Skills
+# Agent Skills Bundle
 
-Portable Markdown skills for coding agents. Each directory contains a `SKILL.md` with operating instructions and optional helper scripts.
+Custom portable skills plus dependency management for skills maintained in other repositories, behind one minimal installer powered by [`npx skills`](https://github.com/vercel-labs/skills).
 
-These skills are written to be agent-agnostic where possible. Tool-specific skills still assume the named CLI exists on `PATH`.
+Each local skill directory contains a `SKILL.md` with operating instructions and optional helper scripts. Skills are agent-agnostic where possible; tool-specific skills still assume the named CLI exists on `PATH`.
 
 ## Skills
 
@@ -41,6 +41,7 @@ They are not vendored, and their full catalogs are not snapshotted here. The ins
   scripts/            # optional helper scripts
   state/              # optional local state, ignored by git
 bin/install.mjs       # live unified installer
+skill-overrides.json  # preferred source for same-name skills
 ```
 
 ## Install
@@ -53,7 +54,11 @@ npx github:adstastic/agent-skills
 
 The installer loads every current upstream catalog, lets you search and select skills from each source, then asks project/global scope, coding agents, and symlink/copy method once. It validates each parsed catalog count before showing choices and aborts rather than silently presenting a partial list. `--yes` installs the curated defaults without prompts.
 
-Local `grill-me` and `grill-with-docs` differ from Matt Pocock's same-name skills. Selecting both versions lets the later Matt installation replace the local one.
+### Overrides
+
+`skill-overrides.json` records intentional same-name forks as `skill name → preferred source`. When both versions are selected, the preferred source wins; selecting only the non-preferred source still installs it. Unmapped collisions remain an interactive choice.
+
+The local `grill-me` and `grill-with-docs` are standalone workflows, while Matt Pocock's current versions delegate to his `grilling` and `domain-modeling` skills, so both are explicitly overridden to `adstastic/agent-skills`.
 
 For the non-interactive personal preset, clone the repo and run:
 
@@ -70,7 +75,3 @@ pi --skill /path/to/agent-skills
 ```
 
 Helper scripts use relative paths in docs. If your agent runs from another directory, set a `SKILLS_DIR` env var or replace `./<skill>/scripts/...` with an absolute path in your local copy.
-
-## Redaction note
-
-This public copy intentionally omits local state files, device identifiers, personal paths, and project-specific defaults.
