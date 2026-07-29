@@ -19,7 +19,6 @@ Each local skill directory contains a `SKILL.md` with operating instructions and
 - `ios-device-runner` — build, install, and launch an iOS app on a physical device; configure with CLI flags, env vars, or a private `--config` file.
 - `phoenix-grilling` — extract success criteria and unresolved decisions through proportionate, non-leading, Phoenix-aware questioning.
 - `project-catchup` — quickly bootstrap context for active repo work.
-- `regen` — regenerative-software practice across the whole SDLC: specs, evaluations, boundaries, and provenance as the assets; code as disposable.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
 - `security-privacy-review` — audit a PR, diff, or codebase for security and privacy risks.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
