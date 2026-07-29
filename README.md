@@ -27,11 +27,11 @@ The installer also installs these directly from their upstream repositories:
 
 - [Agent Browser](https://github.com/vercel-labs/agent-browser)
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
-- All three skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos), with its two portable review skills selected by default
+- [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
-- All skills currently exposed by [Matt Pocock's skills](https://github.com/mattpocock/skills), with `code-review`, `codebase-design`, `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `research`, `tdd`, and `teach` selected by default
+- [Matt Pocock's skills](https://github.com/mattpocock/skills)
 
-They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill remains optional because it currently invokes Cursor-specific subagents.
+They are not vendored or snapshotted here. Each repository's current skills, descriptions, and installation prompts come directly from [`npx skills`](https://github.com/vercel-labs/skills); plugin hooks and tools stay out of scope.
 
 ## Layout
 
@@ -40,8 +40,7 @@ They are not vendored here, so their source and update history stay upstream. On
   SKILL.md
   scripts/            # optional helper scripts
   state/              # optional local state, ignored by git
-bin/install.mjs       # interactive installer
-skills-bundle.json    # curated upstream sources
+bin/install.mjs       # upstream installer sequencer
 ```
 
 ## Install
@@ -52,7 +51,9 @@ Run the interactive installer directly from GitHub:
 npx github:adstastic/agent-skills
 ```
 
-Choose the recommended bundle or search every cataloged skill from each source with curated defaults preselected, then choose project/global scope, coding agents, and symlink/copy installation. Duplicate skill names require choosing one source. The installer shows every third-party source and asks once before delegating to [`npx skills`](https://github.com/vercel-labs/skills).
+This runs each repository's current `npx skills add` questionnaire in sequence. Skill, scope, coding-agent, and symlink/copy prompts therefore come from upstream and repeat for each repository; no local catalog can go stale. Extra arguments are forwarded to every questionnaire, but `--yes` installs every skill exposed by every repository.
+
+Local `grill-me` and `grill-with-docs` differ from Matt Pocock's same-name skills. Selecting both versions lets the later Matt installation replace the local one.
 
 For the non-interactive personal preset, clone the repo and run:
 
@@ -60,7 +61,7 @@ For the non-interactive personal preset, clone the repo and run:
 ./sync-skills
 ```
 
-This installs every local and bundled upstream skill globally for Claude Code and Codex. Pi discovers the same canonical `~/.agents/skills` installation. Run it again to fetch upstream changes or restore the bundle on another machine.
+This installs every local skill plus the curated upstream subset globally for Claude Code and Codex. Pi discovers the same canonical `~/.agents/skills` installation. Run it again to fetch upstream changes or restore the bundle on another machine.
 
 For a one-off Pi session without installing globally:
 
