@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "label": "Vercel Labs",
+      "source": "vercel-labs/agent-browser",
+      "skills": ["agent-browser"]
+    },
+    {
+      "label": "Phoenix Architecture",
+      "source": "adstastic/phoenix-architecture",
+      "skills": ["phoenix-architecture"]
+    },
+    {
+      "label": "Cursor Thermos",
+      "source": "https://github.com/cursor/plugins/tree/main/thermos",
+      "skills": ["thermo-nuclear-review", "thermo-nuclear-code-quality-review"]
+    },
+    {
+      "label": "Torvalds Doctrine",
+      "source": "leopiney/linus-torvalds-skills",
+      "skills": ["torvalds-doctrine"]
+    },
+    {
+      "label": "Matt Pocock",
+      "source": "mattpocock/skills",
+      "skills": [
+        "code-review",
+        "codebase-design",
+        "domain-modeling",
+        "grilling",
+        "handoff",
+        "improve-codebase-architecture",
+        "prototype",
+        "research",
+        "tdd",
+        "teach"
+      ]
+    }
+  ]
+}

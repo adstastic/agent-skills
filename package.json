@@ -3,8 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "description": "Portable Markdown skills and a cross-agent sync bundle.",
+  "bin": {
+    "agent-skills": "./bin/install.mjs"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "keywords": ["agent-skills", "claude-code", "codex", "pi", "skills"],
   "pi": {
     "skills": ["*/SKILL.md"]
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.7.0"
   }
 }

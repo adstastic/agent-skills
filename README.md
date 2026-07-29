@@ -23,7 +23,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 - `security-privacy-review` — audit a PR, diff, or codebase for security and privacy risks.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
 
-`./sync-skills` also installs these directly from their upstream repositories:
+The installer also installs these directly from their upstream repositories:
 
 - [Agent Browser](https://github.com/vercel-labs/agent-browser)
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
@@ -38,19 +38,29 @@ They are not vendored here, so their source and update history stay upstream. On
 ```text
 <skill>/
   SKILL.md
-  scripts/        # optional helper scripts
-  state/          # optional local state, ignored by git
+  scripts/            # optional helper scripts
+  state/              # optional local state, ignored by git
+bin/install.mjs       # interactive installer
+skills-bundle.json    # curated upstream sources
 ```
 
 ## Install
 
-Clone the repo and run:
+Run the interactive installer directly from GitHub:
+
+```bash
+npx github:adstastic/agent-skills
+```
+
+Choose the recommended bundle or select skills from each source, then choose project/global scope, coding agents, and symlink/copy installation. The installer shows every third-party source and asks once before delegating to [`npx skills`](https://github.com/vercel-labs/skills).
+
+For the non-interactive personal preset, clone the repo and run:
 
 ```bash
 ./sync-skills
 ```
 
-This installs the local and bundled upstream skills globally for Claude Code, Codex, and Pi using [`npx skills`](https://github.com/vercel-labs/skills). Run it again to fetch upstream changes or restore the bundle on another machine.
+This installs every local and bundled upstream skill globally for Claude Code and Codex. Pi discovers the same canonical `~/.agents/skills` installation. Run it again to fetch upstream changes or restore the bundle on another machine.
 
 For a one-off Pi session without installing globally:
 
