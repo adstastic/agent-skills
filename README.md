@@ -25,6 +25,7 @@ These skills are written to be agent-agnostic where possible. Tool-specific skil
 
 `./sync-skills` also installs these directly from their upstream repositories:
 
+- [Agent Browser](https://github.com/vercel-labs/agent-browser)
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
 - The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)

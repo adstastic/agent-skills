@@ -9,6 +9,7 @@ add() {
 }
 
 add "$repo_dir" --skill '*'
+add vercel-labs/agent-browser --skill agent-browser
 add adstastic/phoenix-architecture --skill phoenix-architecture
 add https://github.com/cursor/plugins/tree/main/thermos \
   --skill thermo-nuclear-review \
