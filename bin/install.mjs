@@ -2,13 +2,17 @@
 
 import * as p from '@clack/prompts';
 import { spawn } from 'node:child_process';
-import { realpathSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { existsSync, realpathSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
 
 const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+
+export function resolveOwnSource(root = packageRoot) {
+  return existsSync(join(root, '.git')) ? root : 'adstastic/agent-skills';
+}
 const commonAgents = [
   ['claude-code', 'Claude Code'],
   ['codex', 'Codex'],
@@ -21,7 +25,7 @@ const commonAgents = [
 ];
 
 export const sources = [
-  { label: "Adi's Agent Skills", source: packageRoot, defaults: '*' },
+  { label: "Adi's Agent Skills", source: resolveOwnSource(), defaults: '*' },
   { label: 'Vercel Labs', source: 'vercel-labs/agent-browser', defaults: ['agent-browser'] },
   {
     label: 'Phoenix Architecture',
@@ -331,7 +335,10 @@ export async function main(argv = process.argv.slice(2)) {
   p.outro('Agent skills installed');
 }
 
-const invokedPath = process.argv[1] ? realpathSync(process.argv[1]) : '';
+let invokedPath = '';
+try {
+  invokedPath = process.argv[1] ? realpathSync(process.argv[1]) : '';
+} catch {}
 if (invokedPath === fileURLToPath(import.meta.url)) {
   main().catch((error) => {
     p.cancel(error instanceof Error ? error.message : String(error));

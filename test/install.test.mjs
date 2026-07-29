@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import {
   buildCommands,
@@ -7,6 +10,7 @@ import {
   loadLiveSources,
   parseArgs,
   parseSkillList,
+  resolveOwnSource,
   selectDefaults,
   sources,
 } from '../bin/install.mjs';
@@ -15,6 +19,17 @@ const listed = (names) =>
   `◇  Found ${names.length} skill${names.length === 1 ? '' : 's'}\n${names
     .map((name) => `│\n│    ${name}\n│\n│      Description for ${name}`)
     .join('\n')}\n`;
+
+test('uses portable GitHub source outside a development checkout', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'agent-skills-source-'));
+  try {
+    assert.equal(resolveOwnSource(root), 'adstastic/agent-skills');
+    await writeFile(join(root, '.git'), 'gitdir: test');
+    assert.equal(resolveOwnSource(root), root);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test('parses shared installer options', () => {
   assert.deepEqual(parseArgs(['--yes', '--global', '--agent', 'pi', '-a', 'codex', '--copy']), {
