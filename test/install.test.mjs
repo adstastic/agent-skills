@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-  applyOverrides,
   buildCommands,
   executeCommands,
+  findOverrideSource,
   loadLiveSources,
   parseArgs,
   overrides,
@@ -64,22 +64,21 @@ test('loads every current source catalog through Skills CLI list mode', async ()
   assert.equal(calls.every((args) => args.at(-1) === '--list'), true);
 });
 
-test('persistent overrides prefer local forks only when both sources are selected', () => {
+test('persistent overrides choose a source only when that provider is selected', () => {
   assert.equal(overrides['grill-me'], 'adstastic/agent-skills');
-  const both = applyOverrides([
-    {
-      id: 'adstastic/agent-skills',
-      skills: [{ name: 'grill-me' }, { name: 'local-only' }],
-    },
-    { id: 'mattpocock/skills', skills: [{ name: 'grill-me' }, { name: 'matt-only' }] },
-  ]);
-  assert.deepEqual(both[0].skills.map((skill) => skill.name), ['grill-me', 'local-only']);
-  assert.deepEqual(both[1].skills.map((skill) => skill.name), ['matt-only']);
-
-  const mattOnly = applyOverrides([
-    { id: 'mattpocock/skills', skills: [{ name: 'grill-me' }] },
-  ]);
-  assert.deepEqual(mattOnly[0].skills, [{ name: 'grill-me' }]);
+  assert.equal(
+    findOverrideSource('grill-me', [
+      { id: 'adstastic/agent-skills', source: '/local' },
+      { id: 'mattpocock/skills', source: 'mattpocock/skills' },
+    ]),
+    '/local'
+  );
+  assert.equal(
+    findOverrideSource('grill-me', [
+      { id: 'mattpocock/skills', source: 'mattpocock/skills' },
+    ]),
+    undefined
+  );
 });
 
 test('noninteractive mode keeps only curated default names', () => {

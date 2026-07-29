@@ -152,28 +152,8 @@ export function selectDefaults(catalogs = sources) {
     .filter((source) => source.skills.length > 0);
 }
 
-export function applyOverrides(catalogs) {
-  const preferredSelections = new Set(
-    Object.entries(overrides)
-      .filter(([name, sourceId]) =>
-        catalogs.some(
-          (source) =>
-            source.id === sourceId &&
-            source.skills.some((skill) => skill.name === name || skill.name === '*')
-        )
-      )
-      .map(([name]) => name)
-  );
-
-  return catalogs
-    .map((source) => ({
-      ...source,
-      skills: source.skills.filter(
-        (skill) =>
-          !preferredSelections.has(skill.name) || overrides[skill.name] === source.id
-      ),
-    }))
-    .filter((source) => source.skills.length > 0);
+export function findOverrideSource(name, providers) {
+  return providers.find((source) => source.id === overrides[name])?.source;
 }
 
 function cancelIfNeeded(value) {
@@ -182,27 +162,31 @@ function cancelIfNeeded(value) {
   return true;
 }
 
-function skillOwners(catalogs) {
-  const owners = new Map();
+function skillSources(catalogs) {
+  const providers = new Map();
   for (const source of catalogs) {
     for (const skill of source.skills) {
-      owners.set(skill.name, [...(owners.get(skill.name) ?? []), source.label]);
+      providers.set(skill.name, [...(providers.get(skill.name) ?? []), source]);
     }
   }
-  return owners;
+  return providers;
 }
 
 async function resolveDuplicates(catalogs) {
-  catalogs = applyOverrides(catalogs);
-  for (const [name, labels] of skillOwners(catalogs)) {
-    if (labels.length < 2) continue;
-    const selectedSource = await p.select({
-      message: `Choose one source for duplicate skill ${name}`,
-      options: catalogs
-        .filter((source) => source.skills.some((skill) => skill.name === name))
-        .map((source) => ({ value: source.source, label: source.label, hint: source.source })),
-    });
-    if (cancelIfNeeded(selectedSource)) return null;
+  for (const [name, providers] of skillSources(catalogs)) {
+    if (providers.length < 2) continue;
+    let selectedSource = findOverrideSource(name, providers);
+    if (!selectedSource) {
+      selectedSource = await p.select({
+        message: `Choose one source for duplicate skill ${name}`,
+        options: providers.map((source) => ({
+          value: source.source,
+          label: source.label,
+          hint: source.source,
+        })),
+      });
+      if (cancelIfNeeded(selectedSource)) return null;
+    }
     for (const source of catalogs) {
       if (source.source !== selectedSource) {
         source.skills = source.skills.filter((skill) => skill.name !== name);
@@ -224,13 +208,16 @@ async function chooseSkills(catalogs) {
   if (cancelIfNeeded(preset)) return null;
   if (preset === 'recommended') return resolveDuplicates(selectDefaults(catalogs));
 
-  const owners = skillOwners(catalogs);
+  const providers = skillSources(catalogs);
   const selected = [];
   for (const source of catalogs) {
     const names = await p.autocompleteMultiselect({
       message: `Skills from ${source.label}`,
       options: source.skills.map((skill) => {
-        const otherOwners = owners.get(skill.name).filter((label) => label !== source.label);
+        const otherOwners = providers
+          .get(skill.name)
+          .filter((provider) => provider.id !== source.id)
+          .map((provider) => provider.label);
         const hints = [
           skill.default ? 'recommended' : null,
           otherOwners.length > 0 ? `also provided by ${otherOwners.join(', ')}` : null,
@@ -354,7 +341,7 @@ export async function main(argv = process.argv.slice(2)) {
   let selected;
   let options;
   if (args.yes) {
-    selected = applyOverrides(selectDefaults());
+    selected = selectDefaults();
     options = { agents: args.agents, copy: args.copy, global: args.global ?? false };
   } else {
     p.intro('Agent Skills installer');
