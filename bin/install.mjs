@@ -38,6 +38,12 @@ export const sources = [
     defaults: ['agent-browser'],
   },
   {
+    id: 'herdrdev/herdr',
+    label: 'Herdr',
+    source: 'herdrdev/herdr',
+    defaults: ['herdr'],
+  },
+  {
     id: 'adstastic/phoenix-architecture',
     label: 'Phoenix Architecture',
     source: 'adstastic/phoenix-architecture',

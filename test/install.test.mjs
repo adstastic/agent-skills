@@ -84,6 +84,10 @@ test('persistent overrides choose a source only when that provider is selected',
 test('noninteractive mode keeps only curated default names', () => {
   const selected = selectDefaults();
   assert.deepEqual(selected[0].skills, [{ name: '*' }]);
+  assert.deepEqual(
+    selected.find((source) => source.source === 'herdrdev/herdr').skills,
+    [{ name: 'herdr' }]
+  );
   assert.equal(
     selected.find((source) => source.source === 'mattpocock/skills').skills.length,
     10
