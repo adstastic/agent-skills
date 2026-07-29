@@ -72,7 +72,7 @@ export async function discoverLocalSkills(root = packageRoot) {
 
 export async function loadSources(root = packageRoot) {
   const bundle = JSON.parse(await readFile(join(root, 'skills-bundle.json'), 'utf8'));
-  if (bundle.version !== 1 || !Array.isArray(bundle.sources)) {
+  if (bundle.version !== 2 || !Array.isArray(bundle.sources)) {
     throw new Error('Unsupported skills-bundle.json format');
   }
 
@@ -80,13 +80,38 @@ export async function loadSources(root = packageRoot) {
     {
       label: "Adi's Agent Skills",
       source: root,
-      skills: await discoverLocalSkills(root),
+      skills: (await discoverLocalSkills(root)).map((skill) => ({ ...skill, default: true })),
     },
-    ...bundle.sources.map((source) => ({
-      ...source,
-      skills: source.skills.map((name) => ({ name })),
-    })),
+    ...bundle.sources.map((source) => {
+      const defaults = new Set(source.defaults);
+      const missingDefaults = source.defaults.filter((name) => !source.skills.includes(name));
+      if (missingDefaults.length > 0) {
+        throw new Error(`${source.label} defaults missing from skills: ${missingDefaults.join(', ')}`);
+      }
+      return {
+        ...source,
+        skills: source.skills.map((name) => ({ name, default: defaults.has(name) })),
+      };
+    }),
   ];
+}
+
+export function selectDefaults(sources) {
+  const selected = sources
+    .map((source) => ({ ...source, skills: source.skills.filter((skill) => skill.default) }))
+    .filter((source) => source.skills.length > 0);
+  const seen = new Map();
+  for (const source of selected) {
+    for (const skill of source.skills) {
+      if (seen.has(skill.name)) {
+        throw new Error(
+          `Recommended skill ${skill.name} is duplicated by ${seen.get(skill.name)} and ${source.label}`
+        );
+      }
+      seen.set(skill.name, source.label);
+    }
+  }
+  return selected;
 }
 
 function cancelIfNeeded(value) {
@@ -95,37 +120,77 @@ function cancelIfNeeded(value) {
   return true;
 }
 
+function skillOwners(sources) {
+  const owners = new Map();
+  for (const source of sources) {
+    for (const skill of source.skills) {
+      const labels = owners.get(skill.name) ?? [];
+      labels.push(source.label);
+      owners.set(skill.name, labels);
+    }
+  }
+  return owners;
+}
+
+async function resolveDuplicates(sources) {
+  const selectedOwners = skillOwners(sources);
+  for (const [name, labels] of selectedOwners) {
+    if (labels.length < 2) continue;
+    const selectedSource = await p.select({
+      message: `Choose one source for duplicate skill ${name}`,
+      options: sources
+        .filter((source) => source.skills.some((skill) => skill.name === name))
+        .map((source) => ({ value: source.source, label: source.label, hint: source.source })),
+    });
+    if (cancelIfNeeded(selectedSource)) return null;
+    for (const source of sources) {
+      if (source.source !== selectedSource) {
+        source.skills = source.skills.filter((skill) => skill.name !== name);
+      }
+    }
+  }
+  return sources.filter((source) => source.skills.length > 0);
+}
+
 async function chooseSkills(sources) {
   const preset = await p.select({
     message: 'Installation preset',
     initialValue: 'recommended',
     options: [
-      { value: 'recommended', label: 'Recommended bundle', hint: 'Install every curated skill' },
-      { value: 'custom', label: 'Customize', hint: 'Choose skills from each source' },
+      { value: 'recommended', label: 'Recommended bundle', hint: 'Install curated defaults' },
+      { value: 'custom', label: 'Customize', hint: 'See every skill from each source' },
     ],
   });
   if (cancelIfNeeded(preset)) return null;
-  if (preset === 'recommended') return sources;
+  if (preset === 'recommended') return selectDefaults(sources);
 
+  const owners = skillOwners(sources);
   const selectedSources = [];
   for (const source of sources) {
     let selectedNames;
     if (source.skills.length === 1) {
+      const skill = source.skills[0];
       const selected = await p.confirm({
-        message: `Install ${source.skills[0].name} from ${source.label}?`,
-        initialValue: true,
+        message: `Install ${skill.name} from ${source.label}?`,
+        initialValue: skill.default,
       });
       if (cancelIfNeeded(selected)) return null;
-      selectedNames = selected ? [source.skills[0].name] : [];
+      selectedNames = selected ? [skill.name] : [];
     } else {
-      const selected = await p.multiselect({
+      const selected = await p.autocompleteMultiselect({
         message: `Skills from ${source.label}`,
-        options: source.skills.map((skill) => ({
-          value: skill.name,
-          label: skill.name,
-          hint: skill.description,
-        })),
-        initialValues: source.skills.map((skill) => skill.name),
+        options: source.skills.map((skill) => {
+          const otherOwners = owners.get(skill.name).filter((label) => label !== source.label);
+          const hints = [
+            skill.default ? 'recommended' : null,
+            skill.description,
+            otherOwners.length > 0 ? `also provided by ${otherOwners.join(', ')}` : null,
+          ].filter(Boolean);
+          return { value: skill.name, label: skill.name, hint: hints.join('; ') || undefined };
+        }),
+        initialValues: source.skills.filter((skill) => skill.default).map((skill) => skill.name),
+        maxItems: 10,
+        placeholder: 'Type to filter',
       });
       if (cancelIfNeeded(selected)) return null;
       selectedNames = selected;
@@ -139,8 +204,11 @@ async function chooseSkills(sources) {
     }
   }
 
-  if (selectedSources.length === 0) p.cancel('No skills selected');
-  return selectedSources.length > 0 ? selectedSources : null;
+  if (selectedSources.length === 0) {
+    p.cancel('No skills selected');
+    return null;
+  }
+  return resolveDuplicates(selectedSources);
 }
 
 async function chooseOptions() {
@@ -251,7 +319,7 @@ export async function main(argv = process.argv.slice(2)) {
   let options;
 
   if (args.yes) {
-    selectedSources = sources;
+    selectedSources = selectDefaults(sources);
     options = { agents: args.agents, copy: args.copy, global: args.global ?? false };
   } else {
     p.intro('Agent Skills installer');

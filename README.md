@@ -27,11 +27,11 @@ The installer also installs these directly from their upstream repositories:
 
 - [Agent Browser](https://github.com/vercel-labs/agent-browser)
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
-- The two portable review skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
+- All three skills from [Thermos](https://github.com/cursor/plugins/tree/main/thermos), with its two portable review skills selected by default
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
-- Selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills): `code-review`, `codebase-design`, `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `research`, `tdd`, and `teach`
+- All skills currently exposed by [Matt Pocock's skills](https://github.com/mattpocock/skills), with `code-review`, `codebase-design`, `domain-modeling`, `grilling`, `handoff`, `improve-codebase-architecture`, `prototype`, `research`, `tdd`, and `teach` selected by default
 
-They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill is excluded because it currently invokes Cursor-specific subagents.
+They are not vendored here, so their source and update history stay upstream. Only their skills are installed; plugin hooks and tools stay out of scope. Thermos's aggregate skill remains optional because it currently invokes Cursor-specific subagents.
 
 ## Layout
 
@@ -52,7 +52,7 @@ Run the interactive installer directly from GitHub:
 npx github:adstastic/agent-skills
 ```
 
-Choose the recommended bundle or select skills from each source, then choose project/global scope, coding agents, and symlink/copy installation. The installer shows every third-party source and asks once before delegating to [`npx skills`](https://github.com/vercel-labs/skills).
+Choose the recommended bundle or search every cataloged skill from each source with curated defaults preselected, then choose project/global scope, coding agents, and symlink/copy installation. Duplicate skill names require choosing one source. The installer shows every third-party source and asks once before delegating to [`npx skills`](https://github.com/vercel-labs/skills).
 
 For the non-interactive personal preset, clone the repo and run:
 

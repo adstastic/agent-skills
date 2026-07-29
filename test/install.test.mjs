@@ -11,6 +11,7 @@ import {
   executeCommands,
   loadSources,
   parseArgs,
+  selectDefaults,
 } from '../bin/install.mjs';
 
 test('parses non-interactive installer options', () => {
@@ -53,7 +54,36 @@ test('loads local and curated upstream sources', async () => {
   assert.equal(sources[0].skills.some((skill) => skill.name === 'repo-audit'), true);
   assert.deepEqual(
     sources.find((source) => source.source === 'vercel-labs/agent-browser').skills,
-    [{ name: 'agent-browser' }]
+    [{ name: 'agent-browser', default: true }]
+  );
+  const matt = sources.find((source) => source.source === 'mattpocock/skills');
+  assert.equal(matt.skills.length, 41);
+  assert.equal(matt.skills.filter((skill) => skill.default).length, 10);
+  assert.equal(matt.skills.find((skill) => skill.name === 'ask-matt').default, false);
+});
+
+test('recommended bundle selects defaults and rejects duplicate names', () => {
+  assert.deepEqual(
+    selectDefaults([
+      {
+        label: 'One',
+        skills: [
+          { name: 'default-one', default: true },
+          { name: 'optional', default: false },
+        ],
+      },
+      { label: 'Two', skills: [{ name: 'default-two', default: true }] },
+    ]).map((source) => source.skills.map((skill) => skill.name)),
+    [['default-one'], ['default-two']]
+  );
+
+  assert.throws(
+    () =>
+      selectDefaults([
+        { label: 'One', skills: [{ name: 'duplicate', default: true }] },
+        { label: 'Two', skills: [{ name: 'duplicate', default: true }] },
+      ]),
+    /Recommended skill duplicate is duplicated/
   );
 });
 
