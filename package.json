@@ -15,5 +15,8 @@
   "keywords": ["agent-skills", "claude-code", "codex", "pi", "skills"],
   "pi": {
     "skills": ["*/SKILL.md"]
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.7.0"
   }
 }

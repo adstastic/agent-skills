@@ -31,7 +31,7 @@ The installer also installs these directly from their upstream repositories:
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
 - [Matt Pocock's skills](https://github.com/mattpocock/skills)
 
-They are not vendored or snapshotted here. Each repository's current skills, descriptions, and installation prompts come directly from [`npx skills`](https://github.com/vercel-labs/skills); plugin hooks and tools stay out of scope.
+They are not vendored, and their full catalogs are not snapshotted here. The installer stores only source URLs and curated default names, reads current skill names from [`npx skills`](https://github.com/vercel-labs/skills), and installs content directly from upstream; plugin hooks and tools stay out of scope.
 
 ## Layout
 
@@ -40,7 +40,7 @@ They are not vendored or snapshotted here. Each repository's current skills, des
   SKILL.md
   scripts/            # optional helper scripts
   state/              # optional local state, ignored by git
-bin/install.mjs       # upstream installer sequencer
+bin/install.mjs       # live unified installer
 ```
 
 ## Install
@@ -51,7 +51,7 @@ Run the interactive installer directly from GitHub:
 npx github:adstastic/agent-skills
 ```
 
-This runs each repository's current `npx skills add` questionnaire in sequence. Skill, scope, coding-agent, and symlink/copy prompts therefore come from upstream and repeat for each repository; no local catalog can go stale. Extra arguments are forwarded to every questionnaire, but `--yes` installs every skill exposed by every repository.
+The installer loads every current upstream catalog, lets you search and select skills from each source, then asks project/global scope, coding agents, and symlink/copy method once. It validates each parsed catalog count before showing choices and aborts rather than silently presenting a partial list. `--yes` installs the curated defaults without prompts.
 
 Local `grill-me` and `grill-with-docs` differ from Matt Pocock's same-name skills. Selecting both versions lets the later Matt installation replace the local one.
 

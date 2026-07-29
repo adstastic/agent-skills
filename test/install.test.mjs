@@ -1,47 +1,98 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildCommands, executeCommands, sources } from '../bin/install.mjs';
+import {
+  buildCommands,
+  executeCommands,
+  loadLiveSources,
+  parseArgs,
+  parseSkillList,
+  selectDefaults,
+  sources,
+} from '../bin/install.mjs';
 
-test('collects local and upstream skill repositories', () => {
-  assert.deepEqual(
-    sources.slice(1),
-    [
-      { label: 'Vercel Labs', source: 'vercel-labs/agent-browser' },
-      { label: 'Phoenix Architecture', source: 'adstastic/phoenix-architecture' },
-      {
-        label: 'Cursor Thermos',
-        source: 'https://github.com/cursor/plugins/tree/main/thermos',
-      },
-      { label: 'Torvalds Doctrine', source: 'leopiney/linus-torvalds-skills' },
-      { label: 'Matt Pocock', source: 'mattpocock/skills' },
-    ]
+const listed = (names) =>
+  `◇  Found ${names.length} skill${names.length === 1 ? '' : 's'}\n${names
+    .map((name) => `│\n│    ${name}\n│\n│      Description for ${name}`)
+    .join('\n')}\n`;
+
+test('parses shared installer options', () => {
+  assert.deepEqual(parseArgs(['--yes', '--global', '--agent', 'pi', '-a', 'codex', '--copy']), {
+    agents: ['pi', 'codex'],
+    copy: true,
+    global: true,
+    help: false,
+    yes: true,
+  });
+  assert.throws(() => parseArgs(['--agent']), /requires an agent ID/);
+});
+
+test('reads a checked skill list from upstream output', () => {
+  assert.deepEqual(parseSkillList(listed(['one', 'two']), 'Test'), ['one', 'two']);
+  assert.throws(
+    () => parseSkillList('◇  Found 2 skills\n│\n│    one\n', 'Test'),
+    /expected 2, parsed 1/
   );
 });
 
-test('forwards options to every upstream Skills CLI questionnaire', () => {
-  const commands = buildCommands(['--global', '--agent', 'pi']);
-  assert.equal(commands.length, 6);
-  for (const command of commands) {
-    assert.deepEqual(command.args.slice(0, 3), ['-y', 'skills', 'add']);
-    assert.deepEqual(command.args.slice(-3), ['--global', '--agent', 'pi']);
-  }
+test('loads every current source catalog through Skills CLI list mode', async () => {
+  const calls = [];
+  const catalogs = await loadLiveSources(async (args) => {
+    calls.push(args);
+    return { code: 0, stdout: listed(['current-skill']), stderr: '' };
+  });
+
+  assert.equal(catalogs.length, sources.length);
+  assert.equal(catalogs.every((source) => source.skills[0].name === 'current-skill'), true);
+  assert.equal(calls.every((args) => args.at(-1) === '--list'), true);
 });
 
-test('stops after first failed upstream installer', async () => {
+test('noninteractive mode keeps only curated default names', () => {
+  const selected = selectDefaults();
+  assert.deepEqual(selected[0].skills, [{ name: '*' }]);
+  assert.equal(
+    selected.find((source) => source.source === 'mattpocock/skills').skills.length,
+    10
+  );
+});
+
+test('builds one noninteractive install per source with shared choices', () => {
+  const commands = buildCommands(
+    [{ label: 'Test', source: 'owner/repo', skills: [{ name: 'one' }, { name: 'two' }] }],
+    { agents: ['pi', 'codex'], copy: true, global: true }
+  );
+  assert.deepEqual(commands[0].args, [
+    '-y',
+    'skills',
+    'add',
+    'owner/repo',
+    '--skill',
+    'one',
+    '--skill',
+    'two',
+    '--agent',
+    'pi',
+    '--agent',
+    'codex',
+    '--global',
+    '--copy',
+    '--yes',
+  ]);
+});
+
+test('stops after first failed installation', async () => {
   const commands = [
     { label: 'One', args: [] },
     { label: 'Two', args: [] },
     { label: 'Three', args: [] },
   ];
   const attempted = [];
-
   await assert.rejects(
     executeCommands(commands, async (command) => {
       attempted.push(command.label);
       return command.label === 'Two' ? 7 : 0;
     }),
-    /Two installer failed \(7\)/
+    /Two installation failed \(7\)/
   );
   assert.deepEqual(attempted, ['One', 'Two']);
 });
