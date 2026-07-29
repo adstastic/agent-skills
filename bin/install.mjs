@@ -118,9 +118,18 @@ export function parseSkillList(output, label = 'source') {
   return names;
 }
 
+export function npxEnv(env = process.env) {
+  const clean = { ...env };
+  delete clean.npm_config_package;
+  return clean;
+}
+
 function captureCommand(args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(npxCommand, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(npxCommand, args, {
+      env: npxEnv(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (chunk) => (stdout += chunk));
@@ -310,7 +319,7 @@ export function buildCommands(selected, options) {
 
 function runCommand(command) {
   return new Promise((resolve, reject) => {
-    const child = spawn(npxCommand, command.args, { stdio: 'inherit' });
+    const child = spawn(npxCommand, command.args, { env: npxEnv(), stdio: 'inherit' });
     child.once('error', reject);
     child.once('exit', (code) => resolve(code ?? 1));
   });

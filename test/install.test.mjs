@@ -9,6 +9,7 @@ import {
   executeCommands,
   findOverrideSource,
   loadLiveSources,
+  npxEnv,
   parseArgs,
   overrides,
   parseSkillList,
@@ -31,6 +32,13 @@ test('uses portable GitHub source outside a development checkout', async () => {
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test('nested npx does not inherit the outer package selection', () => {
+  assert.deepEqual(
+    npxEnv({ PATH: '/bin', npm_config_package: '/outer/package' }),
+    { PATH: '/bin' }
+  );
 });
 
 test('parses shared installer options', () => {
