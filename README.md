@@ -27,6 +27,7 @@ The installer also installs these directly from their upstream repositories:
 
 - [Agent Browser](https://github.com/vercel-labs/agent-browser)
 - [Herdr](https://github.com/herdrdev/herdr)
+- [tuicr](https://github.com/agavra/tuicr)
 - [Phoenix Architecture](https://github.com/adstastic/phoenix-architecture)
 - [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)

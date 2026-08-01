@@ -44,6 +44,12 @@ export const sources = [
     defaults: ['herdr'],
   },
   {
+    id: 'agavra/tuicr',
+    label: 'tuicr',
+    source: 'agavra/tuicr',
+    defaults: ['tuicr'],
+  },
+  {
     id: 'adstastic/phoenix-architecture',
     label: 'Phoenix Architecture',
     source: 'adstastic/phoenix-architecture',

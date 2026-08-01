@@ -96,6 +96,10 @@ test('noninteractive mode keeps only curated default names', () => {
     selected.find((source) => source.source === 'herdrdev/herdr').skills,
     [{ name: 'herdr' }]
   );
+  assert.deepEqual(
+    selected.find((source) => source.source === 'agavra/tuicr').skills,
+    [{ name: 'tuicr' }]
+  );
   assert.equal(
     selected.find((source) => source.source === 'mattpocock/skills').skills.length,
     10
