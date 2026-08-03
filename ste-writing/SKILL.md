@@ -32,7 +32,7 @@ In general writing: requests and action items are procedural. Everything else is
 ## Step 2: Word rules
 
 - **One word, one meaning, one part of speech.** Pick one term for each thing and use it everywhere. Never rotate synonyms for variety ("the actuator" stays "the actuator" — not "the unit", then "the control device").
-- **Use the simple approved word.** See the substitution table below. The full curated list is in `references/word-substitutions.md`. For a word that is in neither table, use the meaning the dictionary gives at [asd-ste100.org](https://www.asd-ste100.org). Do not guess.
+- **Use the simple approved word.** See the substitution table below. The full curated list is in `references/word-substitutions.md`. To check a word against the standard, run `./ste-writing/scripts/ste-lint.py --lookup WORD`. Run `./ste-writing/scripts/fetch-ste-spec.sh` one time first, which downloads the standard and caches the text.
 - **Domain terms are allowed.** Names of real things (technical nouns: "Redis", "landing gear", "pull request") are fine, and domain actions (technical verbs: "merge", "rebase", "solder") are allowed when no approved word says it. Keep them well-known and consistent. No slang or jargon only insiders know.
 - **Never substitute inside a technical noun** (a fixed domain name): "main branch", "backup file", "base image" stay as they are (rule 1.6).
 - **Do not use a noun as a verb or a verb as a noun.** "Oil the surface" → "Apply oil to the surface." "Give the hole a ream" → "Ream the hole."

@@ -13,7 +13,12 @@ tables at runtime, so editing the skill updates the linter automatically.
 Modes:
   ste-lint.py FILE...      lint files, print report, exit 1 if findings
   ste-lint.py --hook       PostToolUse hook: read tool JSON on stdin
+  ste-lint.py --lookup WORD  print the dictionary entry for a word
   ste-lint.py --self-test  run assertions
+
+The dictionary lookup needs the extracted standard. Get it once with
+scripts/fetch-ste-spec.sh, which downloads the PDF from asd-ste100.org and
+caches the text. This project does not redistribute the standard.
 """
 import json
 import os
@@ -29,15 +34,17 @@ _UP = os.path.dirname(_HERE)
 
 
 def _find_skill_dir():
-    candidates = []
-    if os.environ.get("STE_WRITING_ROOT"):
-        root = os.environ["STE_WRITING_ROOT"]
-        candidates += [os.path.join(root, "skills", "ste-writing"), root]
-    candidates += [
-        os.path.join(_UP, "skills", "ste-writing"),  # plugin: hooks/ste-lint.py
-        _UP,                                         # bundle: <skill>/scripts/ste-lint.py
-        _HERE,
-    ]
+    # An explicit root is authoritative. Without this, a caller that points the
+    # linter at one tree silently gets the tables of another.
+    root = os.environ.get("STE_WRITING_ROOT")
+    if root:
+        candidates = [os.path.join(root, "skills", "ste-writing"), root]
+    else:
+        candidates = [
+            os.path.join(_UP, "skills", "ste-writing"),  # plugin: hooks/ste-lint.py
+            _UP,                                         # bundle: <skill>/scripts/ste-lint.py
+            _HERE,
+        ]
     for path in candidates:
         if os.path.isfile(os.path.join(path, "references", "word-substitutions.md")):
             return path
@@ -474,6 +481,82 @@ def self_test():
     print(f"self-test OK ({len(real)} banned words parsed from skill)")
 
 
+def find_spec():
+    """Locate the extracted standard, if this machine has it.
+
+    scripts/fetch-ste-spec.sh puts it in the cache directory. The plugin
+    repository also keeps a copy beside the reference tables.
+    """
+    candidates = [
+        os.environ.get("STE_WRITING_SPEC"),
+        os.path.join(
+            os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
+            "ste-writing", "asd-ste100-issue9.txt",
+        ),
+        os.path.join(SKILL_DIR, "references", "asd-ste100-issue9.txt"),
+    ]
+    for path in candidates:
+        if path and os.path.isfile(path) and os.path.getsize(path) > 100000:
+            return path
+    return None
+
+
+# A dictionary entry starts at column 0 with the word and its part of speech.
+ENTRY = re.compile(
+    r"^[A-Za-z][A-Za-z0-9 ,'()’-]{0,40}?\((?:n|v|adj|adv|prep|conj|pron|art|TN|TV)\)"
+)
+
+
+def lookup(word):
+    """Print each dictionary entry for a word, from the extracted standard."""
+    spec = find_spec()
+    if not spec:
+        print(
+            "The standard is not on this machine. Get it with:\n"
+            "  ./scripts/fetch-ste-spec.sh\n"
+            "It downloads the PDF from asd-ste100.org and extracts the text "
+            "to a local cache. The project does not redistribute the standard, "
+            "because the text is copyrighted."
+        )
+        return 2
+
+    lines = open(spec, encoding="utf-8", errors="replace").read().splitlines()
+
+    # The front matter lists every change in this issue, in the same
+    # "word (v)" shape as the dictionary. Start after the word list begins, or
+    # a lookup returns the changelog entry instead of the definition.
+    begin = 0
+    for i, line in enumerate(lines):
+        if re.search(r"Part 2 - Dictionary\s+Page 2-1-A1\b", line):
+            begin = i
+            break
+
+    start = re.compile(rf"^\s*{re.escape(word)}\b[^A-Za-z]*\(", re.IGNORECASE)
+    found = 0
+    for i, line in enumerate(lines):
+        if i < begin or not start.match(line):
+            continue
+        found += 1
+        block = [line.rstrip()]
+        for follow in lines[i + 1:i + 16]:
+            if ENTRY.match(follow) and len(block) > 1:
+                break
+            if follow.strip():
+                block.append(follow.rstrip())
+        print("\n".join(block))
+        print()
+        if found >= 4:
+            break
+
+    if not found:
+        print(f'No entry for "{word}".')
+        print("A word that the dictionary does not list can still be a technical")
+        print("noun or a technical verb. Refer to rules 1.5 and 1.12.")
+        return 1
+    print(f"(from {spec})")
+    return 0
+
+
 def main():
     args = sys.argv[1:]
     if not args:
@@ -482,6 +565,11 @@ def main():
     if args[0] == "--self-test":
         self_test()
         return 0
+    if args[0] == "--lookup":
+        if len(args) < 2:
+            print("usage: ste-lint.py --lookup WORD")
+            return 2
+        return lookup(" ".join(args[1:]))
     if args[0] == "--hook":
         run_hook()
         return 0

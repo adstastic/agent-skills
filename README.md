@@ -21,7 +21,7 @@ Each local skill directory contains a `SKILL.md` with operating instructions and
 - `project-catchup` — quickly bootstrap context for active repo work.
 - `repo-audit` — copy/clone a repo into `/tmp` and run a critical audit.
 - `security-privacy-review` — audit a PR, diff, or codebase for security and privacy risks.
-- `ste-writing` — write in ASD-STE100 Simplified Technical English, with a bundled linter for the mechanically checkable rules.
+- `ste-writing` — write in ASD-STE100 Simplified Technical English, with a bundled linter and a dictionary lookup for the standard.
 - `tmux-agents` — orchestrate parallel sub-agents in tmux/Supacode panes.
 
 The installer also installs these directly from their upstream repositories:

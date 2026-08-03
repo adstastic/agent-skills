@@ -2,7 +2,7 @@
 
 Curated from the ASD-STE100 Issue 9 dictionary (Part 2). Lowercase = not approved; the right column gives approved alternatives. Alternatives are suggestions — if a replacement changes the meaning, use a different sentence construction instead (rule 9.1). Never substitute inside a technical noun (a fixed domain name): "main branch", "backup file", "base image" stay as they are (rule 1.6). Entries marked * are extrapolations for modern words that are not in the dictionary — the alternative is an approved word.
 
-For a word that is not listed here, use the meaning that the dictionary gives at [asd-ste100.org](https://www.asd-ste100.org). In the standard, a word in UPPERCASE letters is approved and a word in lowercase letters is not.
+For a word that is not listed here, run `ste-lint.py --lookup WORD`. In the standard, a word in UPPERCASE letters is approved and a word in lowercase letters is not.
 
 ## A–C
 

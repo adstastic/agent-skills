@@ -44,5 +44,5 @@ WAIT, WALK, WANT, WEAR, WEIGH, WILL, WIND, WRITE
 Notes:
 - WEAR means "to become damaged by friction" — for clothing use PUT ON or USE.
 - FOLLOW means "come after" — for instructions use OBEY.
-- Restricted-meaning verbs (SEE = with the eyes only; TURN = around an axis or a point only; GO/COME = movement only): check the meaning, not just the word. Read the entry in the standard when you are not sure.
+- Restricted-meaning verbs (SEE = with the eyes only; TURN = around an axis or a point only; GO/COME = movement only): check the meaning, not just the word. Run `ste-lint.py --lookup WORD` for the entry when you are not sure.
 - Technical verbs (domain actions: merge, rebase, compile, drill, solder, boot, click) are allowed when no approved verb fits, and must use the same allowed forms.
