@@ -5,6 +5,8 @@ description: Checkout a repository into /tmp, read and understand the codebase, 
 
 # Repo Audit
 
+Load and apply `review-baseline` first. This skill's repository-wide scope and report format take precedence. The baseline proof bar remains mandatory.
+
 ## Purpose
 
 Deep audit a repo with hostile/critical eye. Default stance: verify by reading code, not README claims. Detect slop: unnecessary abstractions, dead code, cargo-cult patterns, hidden complexity, weak tests, brittle design, security footguns, dependency bloat, and misleading docs.
