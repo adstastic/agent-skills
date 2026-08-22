@@ -121,7 +121,7 @@ Read changed code, not just command output. Check for unrelated edits, leaked se
 
 ### 7. Launch adversarial review
 
-For non-mechanical changes, launch applicable reviewers as independent subagents in one parallel batch. Give each the agreed goal/spec, diff command, commit or worktree baseline, relevant repo instructions, and exact role. Require concise blocker-first findings with file/line evidence and explicit uncertainty.
+Load and apply `review-baseline`. For non-mechanical changes, launch applicable reviewers as independent subagents in one parallel batch. Require each reviewer to load `review-baseline` before its specialized review skills. Give each the agreed goal/spec, diff command, commit or worktree baseline, relevant repo instructions, and exact role. Require concise blocker-first findings with file/line evidence and explicit uncertainty.
 
 **Default reviewers**
 
