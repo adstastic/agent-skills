@@ -92,7 +92,7 @@ Skip competing agents when one obvious reversible design satisfies the constrain
 
 ### 6. Adversarial design review
 
-Before slice planning for non-trivial work, give the recommended design to one fresh read-only critic. Ask it to attack unstated assumptions, contradictions, missing success criteria, invariant or ownership gaps, failure/compatibility/rollback holes, over-engineering, weak test seams, hidden dependencies, horizontal slices, and work not required by the goal.
+Load and apply `review-baseline`. Before slice planning for non-trivial work, give the recommended design to one fresh read-only critic. Require the critic to load `review-baseline` before it evaluates the design. Ask it to attack unstated assumptions, contradictions, missing success criteria, invariant or ownership gaps, failure/compatibility/rollback holes, over-engineering, weak test seams, hidden dependencies, horizontal slices, and work not required by the goal.
 
 Give the critic the agreed goal, design sketch, repo sources, and evidence. Require path/line evidence for code claims, explicit uncertainty, and concise blocker-first output. It must critique, not redesign from scratch.
 
