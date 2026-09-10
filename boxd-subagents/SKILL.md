@@ -56,6 +56,8 @@ If execution reports missing `bwrap`, install the Ubuntu `bubblewrap` package on
 
 Use the same project preparation and prompt-file transfer above. This example permits source reads/edits and the Node test command; adjust the tool list and command allow-list to the authorized task (include `Write` if new files are needed). `dontAsk` denies unapproved tools without an interactive prompt. Do not bypass permissions or use `--bare`, which skips the subscription login.
 
+Match allowed Bash commands to their arguments: `Bash(node --test)` did not authorize `node --test unique-by.test.mjs` in the parallel proof. For that task, use `Bash(node --test unique-by.test.mjs)`. If a needed command is denied, inspect `permission_denials` and resume the same session with that specific authorized command added.
+
 ```bash
 boxd machine exec WORKER -- "cd /home/boxd/task && bash -o pipefail -c 'claude -p --output-format stream-json --verbose --permission-mode dontAsk --tools \"Read,Edit,Bash\" --allowedTools \"Read,Edit,Bash(node --test)\" < /home/boxd/boxd-job/task.txt 2> /home/boxd/boxd-job/stderr.log | tee /home/boxd/boxd-job/events.jsonl'"
 ```
