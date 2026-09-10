@@ -6,7 +6,7 @@ Each local skill directory contains a `SKILL.md` with operating instructions and
 
 ## Skills
 
-- `boxd-subagents` — delegate coding tasks to forked boxd VMs using the existing `codex-base`, resume native sessions, and collect results without terminal automation.
+- `boxd-subagents` — delegate coding tasks to forked boxd VMs using the existing `codex-base` or `claude-base`, resume native sessions, and collect results without terminal automation.
 - `dev-loop-build` — autonomously implement an agreed vertical slice with TDD, risk-adaptive adversarial review, and an atomic local commit.
 - `dev-loop-design` — shape unclear/larger work with pragmatic grilling, bounded research, competing designs, and adversarial review.
 - `dev-loop-pair` — implement an agreed slice through a tight staged-review loop with the user.
