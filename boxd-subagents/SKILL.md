@@ -13,7 +13,7 @@ Keep the coordinator local and run a headless agent in each disposable boxd fork
 
 **`claude-base` also exists**, private and normally hibernated, with Claude Code and a verified Claude Max login. It was created fresh; boxd supplied the account's existing Claude login automatically. It does not contain the Discord machine's running processes. Its `/home/boxd/proof-repo` is also a synthetic example.
 
-**`pi-base` also exists**, private and normally hibernated, with Pi 0.84.4 (`@earendil-works/pi-coding-agent`), Node 24, and verified OpenAI Codex OAuth. `/usr/local/bin/pi` makes the npm-installed executable available to boxd's noninteractive shell. Its `/home/boxd/proof-repo` is a synthetic example. OpenRouter is supported by Pi but has not been authenticated or tested on this base.
+**`pi-base` also exists**, private and normally hibernated, with Pi 0.84.4 (`@earendil-works/pi-coding-agent`), Node 24, and verified OpenAI Codex and OpenRouter browser logins. `/usr/local/bin/pi` makes the npm-installed executable available to boxd's noninteractive shell. Its `/home/boxd/proof-repo` is a synthetic example. OpenAI Codex uses the ChatGPT subscription; OpenRouter browser authorization creates a key billed from OpenRouter credits.
 
 Check the active account and base before work:
 
@@ -73,6 +73,8 @@ For another turn, upload `followup.txt`, add `--resume SESSION_ID` to the same C
 
 Use the same project preparation and prompt-file transfer. Check available models with `pi --list-models openai-codex`; the proof used `gpt-5.5`. Limit tools to the task. Pi's tool list is not a filesystem sandbox: `bash` can execute shell commands as the VM user.
 
+For OpenRouter, check `pi auth check --provider openrouter --json --no-refresh` and `pi --list-models openrouter`, then replace the example's provider/model flags with `--provider openrouter --model openai/gpt-5.4-mini` (verified). If login is missing, use interactive Pi via `boxd machine connect BASE`, then `/login openrouter` → **Sign in with OpenRouter**. On a remote VM, the user pastes the final redirect URL into Pi's terminal prompt, never into the coordinator chat. Exit the login session before forking.
+
 ```bash
 boxd machine exec WORKER -- 'cd /home/boxd/task && bash -o pipefail -c "pi -p --mode json --provider openai-codex --model gpt-5.5 --session /home/boxd/boxd-job/session.jsonl --tools read,edit,write,bash < /home/boxd/boxd-job/task.txt 2> /home/boxd/boxd-job/stderr.log | tee /home/boxd/boxd-job/events.jsonl"'
 ```
@@ -111,5 +113,7 @@ The initial Codex proof forked this base's predecessor, fixed five failing tests
 The Claude proof used a fresh `claude-base` and Claude Code 2.1.263 with inherited Max login. Its fork fixed five failing tests, then resumed the same session after hibernation/wake, recalled prior context, and passed six tests after a changed requirement. The collected Git bundle passed all six tests locally; the bundle and native session hashes matched before worker deletion. The Discord machine was untouched.
 
 The Pi proof used Pi 0.84.4 with OpenAI Codex OAuth and `gpt-5.5`. Its fork fixed six failing tests, resumed the same native session after hibernation/wake, recalled prior context, and passed eight tests after a changed requirement. Independent review found a large-padding stack overflow; another turn fixed it, and all nine tests passed remotely and in the downloaded bundle. Bundle/session hashes matched before worker deletion; `pi-base` remained hibernated.
+
+A separate Pi fork inherited OpenRouter login and used `openai/gpt-5.4-mini` to fix six failing tests. All six passed independently on the VM and in the downloaded bundle; bundle/session hashes matched before worker deletion. The OpenRouter proof covers headless coding and credential inheritance; the hibernation/resume proof used OpenAI Codex.
 
 These proofs validate headless task execution and later session resume, not live mid-turn steering or automatic worker-completion wakeups. Start with the proven CLI flow; add another protocol only when the requested interaction requires it.
