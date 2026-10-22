@@ -6,6 +6,7 @@ Each local skill directory contains a `SKILL.md` with operating instructions and
 
 ## Skills
 
+- `audit-all-my-stuff` — audit someone's devices, accounts, websites, home network, and self-hosted services against current vulnerabilities, with or without a supplied vulnerability list.
 - `boxd-subagents` — delegate coding tasks to forked boxd VMs using the existing `codex-base`, `claude-base`, or `pi-base`, resume native sessions, and collect results without terminal automation.
 - `dev-loop-build` — autonomously implement an agreed vertical slice with TDD, risk-adaptive adversarial review, and an atomic local commit.
 - `dev-loop-design` — shape unclear/larger work with pragmatic grilling, bounded research, competing designs, and adversarial review.
