@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -18,6 +19,12 @@ import {
   sources,
 } from '../bin/install.mjs';
 
+test('package name and bin leave `npx skills` to the Skills CLI', () => {
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.notEqual(pkg.name, 'skills');
+  assert.equal(Object.hasOwn(pkg.bin, 'skills'), false);
+});
+
 const listed = (names) =>
   `◇  Found ${names.length} skill${names.length === 1 ? '' : 's'}\n${names
     .map((name) => `│\n│    ${name}\n│\n│      Description for ${name}`)
@@ -26,7 +33,7 @@ const listed = (names) =>
 test('uses portable GitHub source outside a development checkout', async () => {
   const root = await mkdtemp(join(tmpdir(), 'agent-skills-source-'));
   try {
-    assert.equal(resolveOwnSource(root), 'adstastic/agent-skills');
+    assert.equal(resolveOwnSource(root), 'adstastic/skills');
     await writeFile(join(root, '.git'), 'gitdir: test');
     assert.equal(resolveOwnSource(root), root);
   } finally {
@@ -73,10 +80,10 @@ test('loads every current source catalog through Skills CLI list mode', async ()
 });
 
 test('persistent overrides choose a source only when that provider is selected', () => {
-  assert.equal(overrides['grill-with-docs'], 'adstastic/agent-skills');
+  assert.equal(overrides['grill-with-docs'], 'adstastic/skills');
   assert.equal(
     findOverrideSource('grill-with-docs', [
-      { id: 'adstastic/agent-skills', source: '/local' },
+      { id: 'adstastic/skills', source: '/local' },
       { id: 'mattpocock/skills', source: 'mattpocock/skills' },
     ]),
     '/local'
