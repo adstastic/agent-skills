@@ -13,7 +13,6 @@ Each local skill directory contains a `SKILL.md` with operating instructions and
 - `deep-research-pro` — run ChatGPT Deep Research through Oracle using Adi's logged-in ChatGPT Pro profile.
 - `diagram` — render Mermaid diagrams to high-resolution PNGs.
 - `github-pr-review-comments` — read and manage GitHub PR review threads with `gh` + GraphQL.
-- `grill-me` — stress-test a plan or design through one-question-at-a-time grilling.
 - `grill-socratic` — interview without hints, options, examples, or leading answers.
 - `grill-with-docs` — grill against project language and propose `CONTEXT.md`/ADR updates with approval gates.
 - `hunk-review` — interact with live Hunk diff review sessions via CLI.
@@ -63,7 +62,7 @@ The installer loads every current upstream catalog, lets you search and select s
 
 `skill-overrides.json` records intentional same-name forks as `skill name → preferred source`. When both versions are selected, the preferred source wins; selecting only the non-preferred source still installs it. Unmapped collisions remain an interactive choice.
 
-The local `grill-me` and `grill-with-docs` are standalone workflows, while Matt Pocock's current versions delegate to his `grilling` and `domain-modeling` skills, so both are explicitly overridden to `adstastic/agent-skills`.
+The local `grill-with-docs` is a standalone workflow, while Matt Pocock's current version delegates to his `grilling` and `domain-modeling` skills, so it is explicitly overridden to `adstastic/agent-skills`. Matt Pocock's `grill-me` stays out of the curated defaults because `grill-socratic` covers it.
 
 For the non-interactive personal preset, clone the repo and run:
 

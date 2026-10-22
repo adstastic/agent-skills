@@ -73,16 +73,16 @@ test('loads every current source catalog through Skills CLI list mode', async ()
 });
 
 test('persistent overrides choose a source only when that provider is selected', () => {
-  assert.equal(overrides['grill-me'], 'adstastic/agent-skills');
+  assert.equal(overrides['grill-with-docs'], 'adstastic/agent-skills');
   assert.equal(
-    findOverrideSource('grill-me', [
+    findOverrideSource('grill-with-docs', [
       { id: 'adstastic/agent-skills', source: '/local' },
       { id: 'mattpocock/skills', source: 'mattpocock/skills' },
     ]),
     '/local'
   );
   assert.equal(
-    findOverrideSource('grill-me', [
+    findOverrideSource('grill-with-docs', [
       { id: 'mattpocock/skills', source: 'mattpocock/skills' },
     ]),
     undefined
