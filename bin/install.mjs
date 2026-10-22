@@ -50,12 +50,6 @@ export const sources = [
     defaults: ['tuicr'],
   },
   {
-    id: 'adstastic/phoenix-architecture',
-    label: 'Phoenix Architecture',
-    source: 'adstastic/phoenix-architecture',
-    defaults: ['phoenix-architecture'],
-  },
-  {
     id: 'cursor/plugins/thermos',
     label: 'Cursor Thermos',
     source: 'https://github.com/cursor/plugins/tree/main/thermos',
