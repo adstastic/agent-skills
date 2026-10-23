@@ -78,6 +78,12 @@ export const sources = [
       'teach',
     ],
   },
+  {
+    id: 'cursor/plugins/pstack',
+    label: 'pstack',
+    source: 'https://github.com/cursor/plugins/tree/main/pstack',
+    defaults: '*',
+  },
 ];
 
 export const overrides = JSON.parse(
@@ -156,14 +162,9 @@ export async function loadLiveSources(capture = captureCommand) {
   );
 }
 
-export function selectDefaults(catalogs = sources) {
+export function selectDefaults(catalogs) {
   return catalogs
-    .map((source) => ({
-      ...source,
-      skills:
-        source.skills?.filter((skill) => skill.default) ??
-        (source.defaults === '*' ? [{ name: '*' }] : source.defaults.map((name) => ({ name }))),
-    }))
+    .map((source) => ({ ...source, skills: source.skills.filter((skill) => skill.default) }))
     .filter((source) => source.skills.length > 0);
 }
 
@@ -187,10 +188,15 @@ function skillSources(catalogs) {
   return providers;
 }
 
-async function resolveDuplicates(catalogs) {
+export async function resolveDuplicates(catalogs, interactive = true) {
   for (const [name, providers] of skillSources(catalogs)) {
     if (providers.length < 2) continue;
     let selectedSource = findOverrideSource(name, providers);
+    if (!selectedSource && !interactive) {
+      throw new Error(
+        `Duplicate skill ${name} from ${providers.map((source) => source.id).join(', ')}; add a skill-overrides.json entry for ${name}`
+      );
+    }
     if (!selectedSource) {
       selectedSource = await p.select({
         message: `Choose one source for duplicate skill ${name}`,
@@ -349,6 +355,20 @@ function printHelp() {
   console.log(`Usage: agent-skills [options]\n\nOptions:\n  -y, --yes           Install curated defaults without prompts\n  -g, --global        Install globally\n  -p, --project       Install in current project\n  -a, --agent <id>    Target agent; repeatable\n      --copy           Copy instead of symlink\n  -h, --help           Show help`);
 }
 
+function warnRemovedDefaults(catalogs) {
+  for (const source of catalogs) {
+    if (source.missingDefaults.length > 0) {
+      p.log.warn(`${source.label} removed defaults: ${source.missingDefaults.join(', ')}`);
+    }
+  }
+}
+
+export async function selectNoninteractive(capture) {
+  const catalogs = await loadLiveSources(capture);
+  warnRemovedDefaults(catalogs);
+  return resolveDuplicates(selectDefaults(catalogs), false);
+}
+
 export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   if (args.help) return printHelp();
@@ -356,7 +376,7 @@ export async function main(argv = process.argv.slice(2)) {
   let selected;
   let options;
   if (args.yes) {
-    selected = selectDefaults();
+    selected = await selectNoninteractive();
     options = { agents: args.agents, copy: args.copy, global: args.global ?? false };
   } else {
     p.intro('Agent Skills installer');
@@ -364,11 +384,7 @@ export async function main(argv = process.argv.slice(2)) {
     spinner.start('Loading current skill catalogs');
     const catalogs = await loadLiveSources();
     spinner.stop(`Loaded ${catalogs.reduce((total, source) => total + source.skills.length, 0)} current skills`);
-    for (const source of catalogs) {
-      if (source.missingDefaults.length > 0) {
-        p.log.warn(`${source.label} removed defaults: ${source.missingDefaults.join(', ')}`);
-      }
-    }
+    warnRemovedDefaults(catalogs);
     selected = await chooseSkills(catalogs);
     if (!selected) return;
     options = await chooseInstallOptions();

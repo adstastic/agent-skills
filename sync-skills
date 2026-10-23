@@ -3,8 +3,11 @@ set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
-exec npx -y --package "$repo_dir" agent-skills \
+npx -y --package "$repo_dir" agent-skills \
   --yes \
   --global \
   --agent claude-code \
   --agent codex
+
+[ -e "$HOME/.agents/pstack-models.md" ] ||
+  echo "pstack: run /setup-pstack once in an agent session to choose its models."

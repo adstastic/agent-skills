@@ -15,7 +15,7 @@ import {
   overrides,
   parseSkillList,
   resolveOwnSource,
-  selectDefaults,
+  selectNoninteractive,
   sources,
 } from '../bin/install.mjs';
 
@@ -96,20 +96,41 @@ test('persistent overrides choose a source only when that provider is selected',
   );
 });
 
-test('noninteractive mode keeps only curated default names', () => {
-  const selected = selectDefaults();
-  assert.deepEqual(selected[0].skills, [{ name: '*' }]);
+const captureWith = (pstackNames) => async ([, , , url]) => {
+  const source = sources.find((candidate) => candidate.source === url);
+  const names =
+    source.id === 'cursor/plugins/pstack'
+      ? pstackNames
+      : source.defaults === '*'
+        ? ['local-skill']
+        : [...source.defaults, 'uncurated'];
+  return { code: 0, stdout: listed(names), stderr: '' };
+};
+const skillNames = (selected, id) =>
+  selected.find((source) => source.id === id).skills.map((skill) => skill.name);
+
+test('noninteractive mode keeps only curated default names', async () => {
+  const selected = await selectNoninteractive(captureWith(['poteto-mode']));
+  assert.deepEqual(skillNames(selected, 'adstastic/skills'), ['local-skill']);
+  assert.deepEqual(skillNames(selected, 'herdrdev/herdr'), ['herdr']);
+  assert.deepEqual(skillNames(selected, 'agavra/tuicr'), ['tuicr']);
   assert.deepEqual(
-    selected.find((source) => source.source === 'herdrdev/herdr').skills,
-    [{ name: 'herdr' }]
+    skillNames(selected, 'mattpocock/skills'),
+    sources.find((source) => source.id === 'mattpocock/skills').defaults
   );
-  assert.deepEqual(
-    selected.find((source) => source.source === 'agavra/tuicr').skills,
-    [{ name: 'tuicr' }]
-  );
-  assert.equal(
-    selected.find((source) => source.source === 'mattpocock/skills').skills.length,
-    10
+});
+
+test('noninteractive mode applies overrides to live catalogs', async () => {
+  const selected = await selectNoninteractive(captureWith(['poteto-mode', 'tdd', 'teach']));
+  assert.deepEqual(skillNames(selected, 'cursor/plugins/pstack'), ['poteto-mode']);
+  assert.ok(skillNames(selected, 'mattpocock/skills').includes('tdd'));
+  assert.ok(skillNames(selected, 'mattpocock/skills').includes('teach'));
+});
+
+test('noninteractive mode rejects an unmapped duplicate', async () => {
+  await assert.rejects(
+    selectNoninteractive(captureWith(['poteto-mode', 'herdr'])),
+    /Duplicate skill herdr from herdrdev\/herdr, cursor\/plugins\/pstack; add a skill-overrides\.json entry/
   );
 });
 
