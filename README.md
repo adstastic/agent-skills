@@ -35,6 +35,7 @@ The installer also installs these directly from their upstream repositories:
 - [Thermos](https://github.com/cursor/plugins/tree/main/thermos)
 - [Torvalds Doctrine](https://github.com/leopiney/linus-torvalds-skills)
 - [Matt Pocock's skills](https://github.com/mattpocock/skills)
+- [pstack](https://github.com/cursor/plugins/tree/main/pstack)
 
 They are not vendored, and their full catalogs are not snapshotted here. The installer stores only source URLs and curated default names, reads current skill names from [`npx skills`](https://github.com/vercel-labs/skills), and installs content directly from upstream; plugin hooks and tools stay out of scope.
 
@@ -61,7 +62,7 @@ The installer loads every current upstream catalog, lets you search and select s
 
 ### Overrides
 
-`skill-overrides.json` records intentional same-name forks as `skill name → preferred source`. When both versions are selected, the preferred source wins; selecting only the non-preferred source still installs it. Unmapped collisions remain an interactive choice.
+`skill-overrides.json` records intentional same-name forks as `skill name → preferred source`. When both versions are selected, the preferred source wins; selecting only the non-preferred source still installs it. Unmapped collisions remain an interactive choice. Overrides also apply to `--yes`, where an unmapped collision aborts the install; `tdd` and `teach` come from Matt Pocock's skills, not pstack.
 
 The local `grill-with-docs` is a standalone workflow, while Matt Pocock's current version delegates to his `grilling` and `domain-modeling` skills, so it is explicitly overridden to `adstastic/skills`. Matt Pocock's `grill-me` stays out of the curated defaults because `grill-socratic` covers it.
 
