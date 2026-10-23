@@ -11,7 +11,7 @@ const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 
 export function resolveOwnSource(root = packageRoot) {
-  return existsSync(join(root, '.git')) ? root : 'adstastic/agent-skills';
+  return existsSync(join(root, '.git')) ? root : 'adstastic/skills';
 }
 const commonAgents = [
   ['claude-code', 'Claude Code'],
@@ -26,7 +26,7 @@ const commonAgents = [
 
 export const sources = [
   {
-    id: 'adstastic/agent-skills',
+    id: 'adstastic/skills',
     label: "Adi's Agent Skills",
     source: resolveOwnSource(),
     defaults: '*',

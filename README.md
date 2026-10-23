@@ -54,7 +54,7 @@ skill-overrides.json  # preferred source for same-name skills
 Run the interactive installer directly from GitHub:
 
 ```bash
-npx github:adstastic/agent-skills
+npx github:adstastic/skills
 ```
 
 The installer loads every current upstream catalog, lets you search and select skills from each source, then asks project/global scope, coding agents, and symlink/copy method once. It validates each parsed catalog count before showing choices and aborts rather than silently presenting a partial list. `--yes` installs the curated defaults without prompts.
@@ -63,7 +63,7 @@ The installer loads every current upstream catalog, lets you search and select s
 
 `skill-overrides.json` records intentional same-name forks as `skill name → preferred source`. When both versions are selected, the preferred source wins; selecting only the non-preferred source still installs it. Unmapped collisions remain an interactive choice.
 
-The local `grill-with-docs` is a standalone workflow, while Matt Pocock's current version delegates to his `grilling` and `domain-modeling` skills, so it is explicitly overridden to `adstastic/agent-skills`. Matt Pocock's `grill-me` stays out of the curated defaults because `grill-socratic` covers it.
+The local `grill-with-docs` is a standalone workflow, while Matt Pocock's current version delegates to his `grilling` and `domain-modeling` skills, so it is explicitly overridden to `adstastic/skills`. Matt Pocock's `grill-me` stays out of the curated defaults because `grill-socratic` covers it.
 
 For the non-interactive personal preset, clone the repo and run:
 
@@ -76,7 +76,7 @@ This installs every local skill plus the curated upstream subset globally for Cl
 For a one-off Pi session without installing globally:
 
 ```bash
-pi --skill /path/to/agent-skills
+pi --skill /path/to/skills
 ```
 
 Helper scripts use relative paths in docs. If your agent runs from another directory, set a `SKILLS_DIR` env var or replace `./<skill>/scripts/...` with an absolute path in your local copy.
