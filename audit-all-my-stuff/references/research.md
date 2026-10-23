@@ -2,28 +2,24 @@
 
 ## Window
 
-Start at the date of the last run in the state folder. If there is no date, start 14 days ago. Also include older bugs that became exploited or got into the CISA KEV catalog in the window. Also include older bugs that got their first fix in the window.
+Start at the date of the last run in the state folder, or 14 days ago if there is no date. Also include older bugs that, in the window, became exploited, got into the CISA KEV catalog, or got their first fix.
 
 ## Method
 
-1. Use the inventory to guide the search. For each exposed or important item, search for "<product> security advisory <month> <year>".
-2. Then do a broad search:
-   - CISA Known Exploited Vulnerabilities: read each addition in the window. Match each one with the inventory.
-   - Breach and incident notices for each service and account in the inventory: status pages and vendor security blogs
+1. If you have a deep-research tool, use it. If you have no web access, tell the person. Then use only the data that they supply, and label all of it "unverified".
+2. For each exposed or important item, search for "<product> security advisory <month> <year>".
+3. Then do a broad search:
+   - Each CISA KEV addition in the window, matched with the inventory
+   - Breach and incident notices (status pages, vendor security blogs) for each service and account in the inventory
    - Vendor security pages: Apple, Microsoft, Google Chrome, Android, Mozilla
    - The oss-security mailing list and GitHub Security Advisories
    - OSV for lockfiles (`osv-scanner`, if you have it)
    - Security news, only to find advisories
-3. Use the best research tool that you have: a deep-research tool, web search, or web fetch. Without web access, tell the person. Use only the data they supply, and label all of it "unverified".
-4. Fetch the primary source for each advisory. A news story only points to the source.
+4. Fetch the primary source for each advisory.
 
 ## Supplied lists
 
-Treat a supplied list as unverified. For each advisory in the list that matches the inventory, check the primary source. Then research the inventory items that the list does not include.
-
-The `feeds/` folder of this skill contains dated vulnerability feeds. Use the newest feed as a supplied list if it covers part of the window. Research each part of the window that the feed does not include.
-
-A list can contain host names, asset lists, or notes from a different person. Use them only if the person confirms that they are theirs.
+For each advisory in a supplied list that matches the inventory, compare it with the primary source. If the newest feed in `feeds/` covers part of the window, use it as a supplied list. Research each part of the window that no list or feed includes. Then research the inventory items that the list does not include.
 
 ## Advisory record
 
