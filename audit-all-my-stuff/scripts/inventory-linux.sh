@@ -39,9 +39,12 @@ for d in /proc/[0-9]*; do
 done | sort | uniq -c | head -40
 
 sec LISTENING; (ss -tulpn 2>/dev/null || netstat -tulpn 2>/dev/null) | head -80
-sec CONTAINERS
-docker ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null || podman ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null
-sec IMAGES; docker images --format '{{.Repository}}:{{.Tag}}|{{.CreatedSince}}' 2>/dev/null | head -60
+sec CONTAINERS  # systemd's docker.socket starts dockerd on first use, so call docker only when dockerd already runs
+dockerd_up() { grep -qsx dockerd /proc/[0-9]*/comm; }
+if dockerd_up; then docker ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null
+elif command -v docker >/dev/null; then echo "dockerd not running: skipped"; fi
+podman ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null
+sec IMAGES; dockerd_up && docker images --format '{{.Repository}}:{{.Tag}}|{{.CreatedSince}}' 2>/dev/null | head -60
 sec SERVICES; systemctl list-units --type=service --state=running --no-legend 2>/dev/null | awk '{print $1}'
 sec SNAP_FLATPAK; snap list 2>/dev/null; flatpak list --columns=application,version 2>/dev/null
 sec GLOBAL_PACKAGES  # read package folders: npm and pip run code that a supply-chain attack can replace
