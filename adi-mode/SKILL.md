@@ -48,8 +48,7 @@ A one-word reply such as "go", "do it", an option choice like "b", or "merge" is
 ## Subagents
 
 - The main thread writes no code. Send side research to subagents early, not only when context fills.
-- pstack names a grok model for each second-family seat: interrogate Reviewer B, arena and architect runners, and the arena cross-judge. Run each seat through Codex: `codex review --base <base> -` for a diff, `codex exec -s read-only -` for all other seats. The prompt goes on stdin.
-- In Claude Code, read a grok slug for a code delegate as Sonnet for mechanical edits, and as Opus for all other code.
+- Run every pstack seat by the routes in `~/.agents/pstack-models.md`.
 
 ## Code
 

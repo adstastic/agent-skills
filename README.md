@@ -59,7 +59,7 @@ Run the interactive installer directly from GitHub:
 npx github:adstastic/skills
 ```
 
-The installer loads every current upstream catalog, lets you search and select skills from each source, then asks project/global scope, coding agents, and symlink/copy method once. It validates each parsed catalog count before showing choices and aborts rather than silently presenting a partial list. `--yes` installs the curated defaults without prompts.
+The installer loads every current upstream catalog, lets you search and select skills from each source, then asks project/global scope, coding agents, and symlink/copy method once. It validates each parsed catalog count before showing choices and aborts rather than silently presenting a partial list. `--yes` installs the curated defaults without prompts. After the install, it writes `agents/openai.yaml` into each skill marked `disable-model-invocation: true`, so Codex also keeps those skills manual-only.
 
 ### Overrides
 
@@ -73,7 +73,7 @@ For the non-interactive personal preset, clone the repo and run:
 ./sync-skills
 ```
 
-This installs every local skill plus the curated upstream subset globally for Claude Code and Codex. Pi discovers the same canonical `~/.agents/skills` installation. Run it again to fetch upstream changes or restore the bundle on another machine.
+This installs every local skill plus the curated upstream subset globally for Claude Code and Codex. Pi discovers the same canonical `~/.agents/skills` installation. It also links `~/.agents/pstack-models.md` to this repo's `pstack-models.md`, so edit that file to change the models pstack uses in Claude Code, Codex and Pi. pstack skills read it only when your global agent instructions or adi-mode point at it. Run it again to fetch upstream changes or restore the bundle on another machine.
 
 For a one-off Pi session without installing globally:
 

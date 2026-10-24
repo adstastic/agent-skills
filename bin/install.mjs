@@ -2,7 +2,8 @@
 
 import * as p from '@clack/prompts';
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
@@ -339,6 +340,32 @@ export async function executeCommands(commands, run = runCommand) {
   }
 }
 
+// Codex ignores `disable-model-invocation`; only agents/openai.yaml hides a skill from its model.
+export function markCodexManualOnly(skillsDir, names, warn = (message) => p.log.warn(message)) {
+  const written = [];
+  for (const name of names) {
+    const skillFile = join(skillsDir, name, 'SKILL.md');
+    if (!existsSync(skillFile)) continue;
+    const frontmatter = readFileSync(skillFile, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
+    if (!/^disable-model-invocation:\s*true\s*$/m.test(frontmatter)) continue;
+    const policyFile = join(skillsDir, name, 'agents', 'openai.yaml');
+    if (!existsSync(policyFile)) {
+      mkdirSync(dirname(policyFile), { recursive: true });
+      writeFileSync(policyFile, 'policy:\n  allow_implicit_invocation: false\n');
+      written.push(name);
+    } else if (!/^\s*allow_implicit_invocation\s*:/m.test(readFileSync(policyFile, 'utf8'))) {
+      warn(`${name} is manual-only, but its agents/openai.yaml has no allow_implicit_invocation, so Codex can start it`);
+    }
+  }
+  return written;
+}
+
+export async function installBundle(selected, options, { run = runCommand, home = homedir(), cwd = process.cwd() } = {}) {
+  await executeCommands(buildCommands(selected, options), run);
+  const names = selected.flatMap((source) => source.skills.map((skill) => skill.name));
+  return markCodexManualOnly(join(options.global ? home : cwd, '.agents', 'skills'), names);
+}
+
 function formatPlan(selected, options) {
   return [
     ...selected.map(
@@ -397,7 +424,7 @@ export async function main(argv = process.argv.slice(2)) {
     }
   }
 
-  await executeCommands(buildCommands(selected, options));
+  await installBundle(selected, options);
   p.outro('Agent skills installed');
 }
 
