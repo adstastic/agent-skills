@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { existsSync, readFileSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -10,6 +10,8 @@ import {
   executeCommands,
   findOverrideSource,
   loadLiveSources,
+  installBundle,
+  markCodexManualOnly,
   npxEnv,
   parseArgs,
   overrides,
@@ -173,4 +175,63 @@ test('stops after first failed installation', async () => {
     /Two installation failed \(7\)/
   );
   assert.deepEqual(attempted, ['One', 'Two']);
+});
+
+test('marks manual-only skills for Codex and leaves existing policy files alone', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'agent-skills-codex-'));
+  const skill = async (name, skillMd, yaml) => {
+    await mkdir(join(root, name), { recursive: true });
+    await writeFile(join(root, name, 'SKILL.md'), skillMd);
+    if (yaml === undefined) return;
+    await mkdir(join(root, name, 'agents'));
+    await writeFile(join(root, name, 'agents', 'openai.yaml'), yaml);
+  };
+  const yamlOf = (name) => readFileSync(join(root, name, 'agents', 'openai.yaml'), 'utf8');
+  const flagged = '---\nname: x\ndisable-model-invocation: true\n---\n\nBody\n';
+  const keyed = 'policy:\n  allow_implicit_invocation: true\n';
+  const unkeyed = 'interface:\n  display_name: Unkeyed\n';
+  try {
+    await skill('flagged', flagged);
+    await skill('plain', '---\nname: plain\n---\n\nBody\n');
+    await skill('keyed', flagged, keyed);
+    await skill('unkeyed', flagged, unkeyed);
+    await skill('body-flag', '---\nname: body-flag\n---\n\ndisable-model-invocation: true\n');
+
+    const warnings = [];
+    const names = ['flagged', 'plain', 'keyed', 'unkeyed', 'body-flag', 'missing'];
+    assert.deepEqual(markCodexManualOnly(root, names, (message) => warnings.push(message)), ['flagged']);
+    assert.deepEqual(markCodexManualOnly(root, names, () => {}), []);
+    assert.equal(yamlOf('flagged'), 'policy:\n  allow_implicit_invocation: false\n');
+    assert.equal(existsSync(join(root, 'plain', 'agents')), false);
+    assert.equal(existsSync(join(root, 'body-flag', 'agents')), false);
+    assert.equal(yamlOf('keyed'), keyed);
+    assert.equal(yamlOf('unkeyed'), unkeyed);
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /\bunkeyed\b/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('install marks only installed skills, in the chosen scope, after every command succeeds', async () => {
+  const home = await mkdtemp(join(tmpdir(), 'agent-skills-home-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'agent-skills-cwd-'));
+  const flagged = '---\nname: x\ndisable-model-invocation: true\n---\n';
+  const yaml = (base, name) => existsSync(join(base, '.agents', 'skills', name, 'agents', 'openai.yaml'));
+  try {
+    for (const [base, name] of [[home, 'm'], [cwd, 'm'], [cwd, 'other']]) {
+      await mkdir(join(base, '.agents', 'skills', name), { recursive: true });
+      await writeFile(join(base, '.agents', 'skills', name, 'SKILL.md'), flagged);
+    }
+    const selected = [{ label: 'One', source: 'one', skills: [{ name: 'm' }] }];
+    await assert.rejects(installBundle(selected, { agents: [], global: true }, { run: async () => 1, home, cwd }));
+    assert.equal(yaml(home, 'm'), false);
+    assert.deepEqual(await installBundle(selected, { agents: [], global: false }, { run: async () => 0, home, cwd }), ['m']);
+    assert.equal(yaml(cwd, 'm'), true);
+    assert.equal(yaml(cwd, 'other'), false);
+    assert.equal(yaml(home, 'm'), false);
+  } finally {
+    await rm(home, { recursive: true, force: true });
+    await rm(cwd, { recursive: true, force: true });
+  }
 });

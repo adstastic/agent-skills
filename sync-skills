@@ -9,5 +9,8 @@ npx -y --package "$repo_dir" agent-skills \
   --agent claude-code \
   --agent codex
 
-[ -e "$HOME/.agents/pstack-models.md" ] ||
-  echo "pstack: run /setup-pstack once in an agent session to choose its models."
+models="$HOME/.agents/pstack-models.md"
+if [ ! -e "$models" ]; then
+  ln -sf "$repo_dir/pstack-models.md" "$models"
+  echo "pstack: linked $models to $repo_dir/pstack-models.md."
+fi
