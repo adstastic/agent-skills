@@ -60,8 +60,13 @@ for m in "$HOME/.local/pipx/venvs"/*/pipx_metadata.json "$HOME/Library/Applicati
 done
 uv tool list 2>/dev/null; cargo install --list 2>/dev/null
 
-sec CONTAINERS; docker ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null
-sec VMS; orb list 2>/dev/null; colima list 2>/dev/null; limactl list 2>/dev/null
+sec CONTAINERS  # docker ps can start OrbStack or Docker Desktop, so run it only when a process already listens on the docker socket
+s=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null); s=$(readlink -f "${s#unix://}" 2>/dev/null)
+if [ -S "$s" ] && lsof -U -Fn 2>/dev/null | grep -qxF "n$s"; then docker ps -a --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}' 2>/dev/null
+elif command -v docker >/dev/null; then echo "Docker engine not running: skipped"; fi
+sec VMS  # orb starts OrbStack; colima list and limactl list only read state
+if pgrep -xq 'OrbStack Helper'; then orb list 2>/dev/null; elif command -v orb >/dev/null; then echo "OrbStack not running: skipped"; fi
+colima list 2>/dev/null; limactl list 2>/dev/null
 
 sec LISTENING_TCP; lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1{print $1, $2, $9}' | sort -u
 sec SHARING; launchctl print-disabled system 2>/dev/null | grep -E 'screensharing|smbd|ssh|ARDAgent'; pgrep -l 'screensharingd|ARDAgent|smbd|sshd' 2>/dev/null
